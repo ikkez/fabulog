@@ -1,0 +1,24 @@
+<h1>All Post by Tag: {{ @PARAMS.slug }}</h1>
+<hr>
+<F3:repeat group="{{ @content }}" value="{{ @post }}">
+<div class="post-entry">
+    <h2><a href="{{ @post.slug }}">{{@post.title | esc}}</a></h2>
+
+    <p>
+        <span class="meta date"><i class="glyphicon glyphicon-calendar"></i> {{date('d.m.Y',strtotime(@post.publish_date))}}</span>
+        <F3:check if="{{ @post.tags }}">
+        <span class="meta tags"><i class="glyphicon glyphicon-tags"></i>
+            <F3:repeat group="{{ @post.tags }}" value="{{ @tag }}">
+            <a href="tag/{{ @tag.slug }}" class="badge">{{@tag.title | esc}}</a>
+            </F3:repeat>
+        </span>
+        </F3:check>
+        <span class="meta comments"><i class="glyphicon glyphicon-comment"></i> Comments: {{ count(@post.comments) }}</span>
+    </p>
+
+    <hr />
+    <set text="{{ @post.text }}" />
+    <p>{{@post.teaser ?: substr(\Base::instance()->scrub(@text),0,350) | esc }}...</p>
+    <a href="{{ @post.slug }}" class="btn btn-primary">Read more</a>
+</div>
+</F3:repeat>

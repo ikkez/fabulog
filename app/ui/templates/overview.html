@@ -1,0 +1,65 @@
+<div class="col-sm-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Dashboard</h3>
+        </div>
+        <div class="panel-body">
+            <p>Hey, {{ @BACKEND_USER.name }}. This is the fabulog admin center, or at least it should become something like that ;)</p>
+            <p>fabulog currently has the following features:</p>
+            <ul>
+                <li>Jig, SQL and Mongo database support with Cortex ORM</li>
+                <li>Post module with publishing by state and date</li>
+                <li>Tag management</li>
+                <li>Comment module with backend moderation</li>
+                <li>simple User management module</li>
+                <li>Sommernote Bootstrap WYSIWYG editor</li>
+                <li>build with RMR architecture</li>
+                <li>powered by fat-free framework</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6">
+    <F3:set error_data="{{!is_writeable('app/data')}}" />
+    <F3:set error_tmp="{{!is_writeable(@TEMP)}}" />
+    <F3:set error_res="{{!is_writeable(@UPLOADS)}}" />
+    <F3:check if="{{@error_data || @error_tmp || @error_res}}">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">System Check</h3>
+            </div>
+            <div class="panel-body">
+                <p> Please check the following notices:</p>
+                <ul>
+                <F3:check if="{{ @error_data }}">
+                    <li>The application data directoy <code>{{ @BASE }}/app/data</code> is not writeable!</li>
+                </F3:check>
+                <F3:check if="{{ @error_tmp }}">
+                    <li>The directory <code>{{ @BASE.'/'.@TEMP }}</code> for temporary files is not writeable!</li>
+                </F3:check>
+                <F3:check if="{{ @error_res }}">
+                    <li>The upload directory <code>{{ @BASE.'/'.@UPLOADS }}</code> is not writeable!</li>
+                </F3:check>
+                </ul>
+            </div>
+        </div>
+    </F3:check>
+    <F3:set new_comments="{{\Resource\Comment::countNew()}}"/>
+    <div id="comment-widget" class="panel {{@new_comments>0?'panel-info':'panel-default'}}">
+        <div class="panel-heading">
+            <h3 class="panel-title">Comments</h3>
+        </div>
+        <div class="panel-body">
+            <F3:check if="{{ @new_comments > 0 }}">
+                <true>
+                    <p>
+                        You have <span class="label label-primary">{{ @new_comments }}</span> new comments, that needs your <a href="admin/comment">review</a>.
+                    </p>
+                </true>
+                <false>
+                    <p>You have no new comments</p>
+                </false>
+            </F3:check>
+        </div>
+    </div>
+</div>

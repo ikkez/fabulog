@@ -1,0 +1,58 @@
+<h2>Comment list</h2>
+
+<F3:check if="{{ !@content}}">
+    <div class="solid">
+    <div class="alert alert-info">You have no comments in this list.</div>
+    </div>
+</F3:check>
+
+<F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{ @content.limit }}" token-prefix="page-" />
+
+<F3:repeat group="{{ @content.subset }}" value="{{ @item }}">
+    <div class="row solid">
+        <div class="col-md-8">
+            <dl class="dl-horizontal w120 comment-element">
+                <dt><i class="glyphicon glyphicon-share-alt"></i> Answer to</dt>
+                <dd><a href="{{@item.post.slug}}" target="_blank">{{ @item.post.title | esc }}</a></dd>
+                <dt><i class="glyphicon glyphicon-user"></i> Name</dt>
+                <dd>{{@item.author_name | esc}}</dd>
+                <dt><i class="glyphicon glyphicon-envelope"></i> E-Mail</dt>
+                <dd>{{@item.author_email | esc}}</dd>
+                <dt><i class="glyphicon glyphicon-calendar"></i> Date</dt>
+                <dd>{{date('d.m.Y, H:i',strtotime(@item.datetime))}}</dd>
+                <dt><i class="glyphicon glyphicon-comment"></i> Message</dt>
+                <dd>{{@item.message | esc }}</dd>
+                <dt><i class="glyphicon glyphicon-comment"></i> Publish state:</dt>
+                <dd>
+                    <F3:switch expr="{{@item.approved}}">
+                        <default>new</default>
+                        <case value="1">published</case>
+                        <case value="2">rejected</case>
+                    </F3:switch>
+
+                </dd>
+                <dd>
+                    <br/>
+                    <switch expr="{{@item.approved}}">
+                        <default>
+                            <a href="admin/comment/approve/{{@item._id}}" class="btn btn-sm btn-success"><i class="glyphicon glyphicon-thumbs-up"></i> approve</a>
+                            <a href="admin/comment/reject/{{@item._id}}" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-thumbs-down"></i> reject</a>
+                            <a href="admin/comment/edit/{{@item._id}}" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-pencil"></i> edit</a>
+                        </default>
+                        <case value="1">
+                            <a href="admin/comment/reject/{{@item._id}}" class="btn btn-sm btn-info"><i class="glyphicon glyphicon-thumbs-down"></i> reject</a>
+                            <a href="admin/comment/edit/{{@item._id}}" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-pencil"></i> edit</a>
+                        </case>
+                        <case value="2">
+                            <a href="admin/comment/approve/{{@item._id}}" class="btn btn-sm btn-success"><i class="glyphicon glyphicon-thumbs-up"></i> approve</a>
+                            <a href="admin/comment/edit/{{@item._id}}" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-pencil"></i> edit</a>
+                            <a href="admin/comment/delete/{{@item._id}}" class="btn btn-sm btn-warning bs-tooltip" title="this will immediately erase it"><i class="glyphicon glyphicon-trash"></i> delete</a>
+                        </case>
+                    </switch>
+                </dd>
+            </dl>
+
+
+        </div>
+    </div>
+</F3:repeat>

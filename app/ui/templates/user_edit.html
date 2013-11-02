@@ -1,0 +1,40 @@
+<check if="{{ isset(@PARAMS.id) }}">
+    <true>
+        <h2>Edit User</h2>
+    </true>
+    <false>
+        <h2>Create new User</h2>
+    </false>
+</check>
+<div class="row solid">
+    <div class="col-lg-12">
+        <form action="admin/user/{{(isset(@PARAMS.id))?@PARAMS.id:''}}" method="post" class="form-horizontal" role="form">
+
+            <div class="form-group {{ @FLASH->getKey('form.username') }}">
+                <label for="input-username" class="col-lg-2 control-label">Username*</label>
+                <div class="col-sm-3">
+                    <input {{(isset(@content.username)?'value="'.@content.username.'"':'')}} type="text" name="username" class="form-control" id="input-username" placeholder="unique login name" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-name" class="col-lg-2 control-label">Name*</label>
+                <div class="col-sm-3">
+                    <input {{(isset(@content.name)?'value="'.@content.name.'"':'')}} type="text" name="name" class="form-control" id="input-name" placeholder="display name" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-password" class="col-lg-2 control-label">Password*</label>
+                <div class="col-sm-3">
+                    <input {{(isset(@content.password)?'value="'.@content.password.'"':'')}} type="password" name="password" class="form-control" id="input-password" required>
+                </div>
+            </div>
+            <div class="form-group {{ @FLASH->getKey('form.mail') }}">
+                <label for="input-mail" class="col-lg-2 control-label">E-Mail</label>
+                <div class="col-sm-3">
+                    <input {{(isset(@content.mail)?'value="'.@content.mail.'"':'')}} type="email" name="mail" class="form-control" id="input-mail">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</div>

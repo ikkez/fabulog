@@ -1,0 +1,70 @@
+<h2>Post list</h2>
+
+<F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{@content.limit}}" token-prefix="page-"/>
+
+<F3:repeat group="{{ @content.subset }}" value="{{ @item }}">
+    <check if="{{ isset(@lastDate) }}">
+        <true>
+            <check if="{{ @lastDate != @item.publish_date }}">
+                <set lastDate="{{@item.publish_date}}"/>
+                <h4>{{date('d.m.Y',strtotime(@lastDate))}}</h4>
+            </check>
+        </true>
+        <false>
+            <set lastDate="{{@item.publish_date}}" />
+            <h4>{{date('d.m.Y',strtotime(@lastDate))}}</h4>
+        </false>
+    </check>
+    <div class="post-list-item solid">
+        <div class="row">
+            <div class="col-md-8">
+                <p class="title">{{@item.title}}</p>
+            </div>
+            <div class="col-md-4">
+                <div class="pull-right">
+                    <div class="btn-group btn-group-sm">
+                        <a href="admin/post/edit/{{ @item._id }}" class="btn btn-default">
+                            <i class="glyphicon glyphicon-pencil"></i> edit
+                        </a>
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <check if="{{ @item.published == 1 }}">
+                                    <true>
+                                        <a href="admin/post/hide/{{ @item._id }}"><i class="glyphicon glyphicon-eye-close"></i> hide</a>
+                                    </true>
+                                    <false>
+                                        <a href="admin/post/publish/{{ @item._id }}"><i class="glyphicon glyphicon-eye-open"></i> publish</a>
+                                    </false>
+                                </check>
+                            </li>
+                            <li><a href="admin/comment/list/{{ @item._id }}"><i class="glyphicon glyphicon-comment"></i> view comments</a></li>
+                            <li class="divider"></li>
+                            <li>
+                                <a href="admin/post/delete/{{@item._id}}">
+                                    <i class="glyphicon glyphicon-trash"></i> delete
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="meta">
+                <span class="author pull-left"><i class="glyphicon glyphicon-user"></i> {{isset(@item.author)?@item.author.name:''}}</span>
+                <check if="{{ @item.published == 1 }}">
+                    <true>
+                        <span style="background-color: lightgreen;">
+                            <i class="glyphicon glyphicon-eye-open"></i> active</span>
+                    </true>
+                    <false>
+                        <span style="background-color: darkorange;">
+                            <i class="glyphicon glyphicon-eye-close"></i> hidden</span>
+                    </false>
+                </check>
+                <span><i class="glyphicon glyphicon-comment"></i> {{count(@item.comments)}}</span>
+        </div>
+    </div>
+</F3:repeat>

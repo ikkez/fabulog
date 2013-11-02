@@ -1,0 +1,25 @@
+{
+    "5270220ebb01b0.93149557": {
+        "ACTIVE_DB": "JIG",
+        "DB_JIG": {
+            "dir": "app\/data\/"
+        },
+        "DB_MYSQL": {
+            "dsn": "mysql:host=localhost;port=3306;dbname=fatfree",
+            "user": "fatfree",
+            "password": ""
+        },
+        "DB_SQLITE": {
+            "dsn": "sqlite:app\/data\/fblog_sqlite.db"
+        },
+        "DB_PGSQL": {
+            "dsn": "pgsql:host=localhost;dbname=fatfree",
+            "user": "fatfree",
+            "password": "fatfree"
+        },
+        "DB_MONGO": {
+            "dsn": "mongodb:\/\/localhost:27017",
+            "dbname": "fabulog"
+        }
+    }
+}

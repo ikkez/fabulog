@@ -1,0 +1,102 @@
+<check if="{{ isset(@PARAMS.id) }}">
+	<true>
+        <h2>Edit Post</h2>
+    </true>
+	<false>
+        <h2>Create new Post</h2>
+    </false>
+</check>
+<div class="row solid">
+    <div class="col-lg-12">
+        <form id="post-form" action="admin/post/{{(isset(@PARAMS.id))?@PARAMS.id:''}}" method="post" class="form-horizontal" role="form">
+            <F3:check if="{{isset(@content) && isset(@content.title)}}">
+                <div class="pull-right">written by: {{ @content.author.name }}</div>
+            </F3:check>
+            <div class="form-group">
+                <div class="col-sm-5">
+                    <label for="input-title">Title</label>
+                    <input {{(isset(@content.title)?'value="'.@content.title.'"':'')}} type="text" name="title" class="form-control" id="input-title" placeholder="Give your post a meaningful headline">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-3">
+                    <label for="input-date">Publish Date</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                        <input type="text" name="publish_date" class="form-control datepicker" id="input-date" value="{{isset(@content.publish_date) ? date('d.m.Y',strtotime(@content.publish_date)) : date('d.m.Y')}}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <check if="{{ isset(@content.image) && @content.image }}">
+                        <img id="post-image" class="thumbnail" src="{{ @content.image }}" alt=""/>
+                    </check>
+                    <span id="upload-btn" class="fileinput-button">
+                        <p><i class="glyphicon glyphicon-picture"></i><br />Upload an Image</p>
+                        <!-- The file input field used as target for the file upload widget -->
+                        <input id="input-image" type="hidden" name="image" value="{{ @content.image }}">
+                        <input id="fileupload" type="file" name="fileupload">
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <label for="input-text">Teaser Text</label>
+                    <span class="help-block">This is a little introduction text that mark out your article on overview pages or in RSS feed.</span>
+                    <textarea class="form-control" name="teaser" id="input-teaser" placeholder="a summary of your Post" rows="3">{{isset(@content.teaser)?@content.teaser:''}}</textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <label for="input-text">Body Text</label>
+                    <F3:switch expr="{{@text_editor}}">
+                        <case value="sommernote">
+                            <input type="hidden" name="text" id="input-text">
+                            <div id="blog-text">{{isset(@content.text)?@content.text:''}}</div>
+                        </case>
+                        <default>
+                            <textarea class="form-control" name="text" id="input-text" placeholder="Your Blog Post text" rows="12">
+                                {{isset(@content.text)?@content.text:''}}
+                            </textarea>
+                        </default>
+                    </F3:switch>
+                </div>
+            </div>
+            <i class="icon-"></i>
+            <div class="form-group">
+                <div class="col-sm-6">
+                    <label for="input-tags">Tags</label>
+                    <div id="taglist"></div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                        <input type="text" name="tags" placeholder="Tag Name" class="form-control tm-input" id="input-tags" data-value="{{(isset(@content) && is_object(@content.tags))? implode(',',@content.tags->getAll('title')) :''}}">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6">
+                    <label>Publish state</label>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="published" id="published1" value="0" {{((isset(@content.published) && @content.published==0)?'checked':'')}}>
+                            Draft
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="published" id="published2" value="1" {{((isset(@content.published) && @content.published==1)?'checked':'')}}>
+                            Published
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">Save</button>
+
+        </form>
+    </div>
+</div>

@@ -1,0 +1,78 @@
+<article class="post-entry">
+    <div class="page-header">
+        <h1>{{@content.title | esc}}</h1>
+    </div>
+    <p>
+        <span class="meta date"><i class="glyphicon glyphicon-calendar"></i> {{date('d.m.Y',strtotime(@content.publish_date))}}</span>
+        <F3:check if="{{ @content.tags }}">
+        <span class="meta tags"><i class="glyphicon glyphicon-tag"></i>
+            <F3:repeat group="{{ @content.tags }}" value="{{ @tag }}">
+                <a href="tag/{{ @tag.slug }}" class="badge">{{@tag.title | esc}}</a>
+            </F3:repeat>
+        </span>
+        </F3:check>
+    </p>
+    <hr/>
+    <F3:check if="{{ @content.teaser }}">
+        <div class="teaser-text">{{ @content.teaser }}</div>
+    </F3:check>
+    <F3:check if="{{isset(@content.image) && @content.image}}">
+        <figure class="">
+            <a href="{{ @content.image }}" class="fancybox">
+            <f3:image src="{{@content.image}}" crop="false" width="300" height="200" alt="{{ @content.title | esc }}" class="thumbnail pull-left" />
+            </a>
+        </figure>
+    </F3:check>
+    <div class="bodytext">
+    {{@content.text}}
+    </div>
+    <aside class="clearfix">
+
+        <section id="comment-list">
+            <h3>Comments ({{ count(@content.comments) }})</h3>
+            <check if="{{ @content.comments }}">
+            <true>
+                <repeat group="{{ @content.comments }}" value="{{ @comment }}">
+                    <div class="comment well">
+                        <div class="author">{{ @comment.author_name | esc }} wrote on {{date('d.m.Y, H:i',strtotime(@comment.datetime)) | esc }}</div>
+                        <div class="message">{{ @comment.message | esc }}</div>
+                    </div>
+                </repeat>
+            </true>
+            <false>
+                No comments yet.
+            </false>
+            </check>
+        </section>
+
+        <h3>Leave a Comment</h3>
+        <form class="form-horizontal" role="form" action="{{ @content.slug }}" method="post">
+            <F3:repeat group="{{ \FlashMessage::instance()->getMessages() }}" value="{{ @msg }}">
+                <div class="alert alert-{{ @msg.status }} alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ @msg.text | esc }}
+                </div>
+            </F3:repeat>
+            <div class="form-group">
+                <div class="col-sm-5">
+                    <label for="input-name">Your name</label>
+                    <input type="text" name="author_name" class="form-control" id="input-name" value="{{isset(@POST.author_name)?@POST.author_name:'' | esc}}" >
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-5">
+                    <label for="input-mail">Your email</label>
+                    <input type="email" name="author_email" class="form-control" id="input-mail" value="{{isset(@POST.author_email)?@POST.author_email:'' | esc}}">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <label for="input-text">Your message</label>
+                    <textarea class="form-control" name="message" id="input-text" placeholder="What are you thinking?" rows="6">{{isset(@POST.message)?@POST.message:'' | esc}}</textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+
+        </form>
+    </aside>
+</article>

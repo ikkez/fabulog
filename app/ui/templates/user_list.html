@@ -1,0 +1,27 @@
+<h2>User list</h2>
+
+<include href="templates/alert.html"/>
+
+<div class="solid">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <F3:repeat group="{{ @content }}" value="{{ @item }}">
+            <tr>
+                <td>{{ @item.username }}</td>
+                <td>{{ @item.name }}</td>
+                <td>
+                    <a href="admin/user/edit/{{@item._id}}" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-pencil"></i> edit</a>
+                    <a href="admin/user/delete/{{@item._id}}" class="btn btn-sm btn-default"><i class="glyphicon glyphicon-trash"></i> delete</a>
+                </td>
+            </tr>
+        </F3:repeat>
+        </tbody>
+    </table>
+</div>

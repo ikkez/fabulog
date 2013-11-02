@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
+    <meta charset="{{@$ENCODING}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{@UI}}ico/favicon.png">
+    <title>fabulog backend - {{@blog.name}}</title>
+    <link href="{{@UI}}css/bootstrap.min.css"    rel="stylesheet">
+    <link href="{{@UI}}css/datepicker.css" rel="stylesheet">
+    <link href="{{@UI}}css/tagmanager.css" rel="stylesheet">
+    <link href="{{@UI}}css/backend.css" rel="stylesheet">
+
+    <F3:check if="{{ isset(@ASSETS.CSS) }}">
+    <F3:repeat group="{{ @ASSETS.CSS }}" value="{{ @path }}">
+    <link href="{{@path}}" rel="stylesheet">
+    </F3:repeat>
+    </F3:check>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="{{@UI}}js/vendor/html5shiv.js"></script>
+    <script src="{{@UI}}js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="navbar navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!--<a class="navbar-brand" href="admin/">fabulog backend</a>-->
+            <a class="navbar-brand" href="admin/"><img src="app/ui/images/fabulog-small.png"/></a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li {{(@PARAMS.0 == '/admin'?'class="active"':'') }}">
+                    <a href="admin/"><i class="glyphicon glyphicon-dashboard"></i> Dashboard</a>
+                </li>
+                {{*
+                <li {{(is_int(strpos(@PARAMS.0,'page'))?'class="active"':'')}}>
+                    <a href="admin/#">Pages</a>
+                </li>
+                *}}
+                <li {{(is_int(strpos(@PARAMS.0,'post'))?'class="active"':'')}}>
+                    <a href="admin/post"><i class="glyphicon glyphicon-align-left"></i> Posts</a>
+                </li>
+                <li {{(is_int(strpos(@PARAMS.0,'comment'))?'class="active"':'')}}>
+                    <a href="admin/comment">
+                        <i class="glyphicon glyphicon-comment"></i> Comments
+                    </a>
+                </li>
+                <li {{(is_int(strpos(@PARAMS.0,'user'))?'class="active"':'')}}>
+                    <a href="admin/user"><i class="glyphicon glyphicon-user"></i> User</a>
+                </li>
+                <li class="pull-right"><a href="logout"><i class="glyphicon glyphicon-off"></i> <small>logout</small></a></li>
+                <li class="pull-right">
+                    <a href="{{@BASE}}"><i class="glyphicon glyphicon-home"></i>
+                        <small>display blog</small>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="row">
+        <include if="{{isset(@LAYOUT)}}" href="{{'templates/'.@LAYOUT}}"/>
+    </div>
+
+    <div class="stats">{{ \Base::instance()->format('Page rendered in {0} msecs / Memory usage {1} KB',round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</div>
+</div>
+
+<!-- /.container -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{{@UI}}js/vendor/jquery.js"></script>
+<script src="{{@UI}}js/vendor/bootstrap.min.js"></script>
+<script src="{{@UI}}js/bootstrap-datepicker.js"></script>
+<script src="{{@UI}}js/typeahead.min.js"></script>
+<script src="{{@UI}}js/tagmanager.js"></script>
+
+<F3:check if="{{ isset(@ASSETS.JS) }}">
+<F3:repeat group="{{ @ASSETS.JS }}" value="{{ @path }}">
+<script src="{{ @path }}"></script>
+</F3:repeat>
+</F3:check>
+
+<script src="{{@UI}}js/app.js"></script>
+</body>
+</html>

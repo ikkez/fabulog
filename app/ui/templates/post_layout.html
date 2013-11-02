@@ -1,0 +1,26 @@
+<div class="col-sm-4 col-md-3 col-lg-2">
+    <div class="list-group">
+        <a href="admin/post/create" class="list-group-item{{(@PARAMS.0=='/admin/post/create'?' active':'') }}">
+            <i class="glyphicon glyphicon-plus-sign"></i> Create Post
+        </a>
+        <a href="admin/post" class="list-group-item{{(preg_match('/\/admin\/post($|(?=\/page))/i',@PARAMS.0)?' active':'') }}">
+            <i class="glyphicon glyphicon-list"></i> List Posts
+        </a>
+        <a href="admin/comment" class="list-group-item{{(is_int(strpos(@PARAMS.0,'comment'))?' active':'') }}">
+
+            <set new_comments="{{\Resource\Comment::countNew()}}"/>
+            <check if="{{ @new_comments > 0 }}">
+                <span class="badge">{{ @new_comments }}</span>
+            </check>
+            <i class="glyphicon glyphicon-comment"></i> Comments
+        </a>
+    </div>
+</div>
+
+<div class="col-sm-8 col-md-9 col-lg-10">
+
+    <include href="templates/alert.html"/>
+
+    <include if="{{isset(@SUBPART)}}" href="{{'templates/'.@SUBPART}}"/>
+
+</div>

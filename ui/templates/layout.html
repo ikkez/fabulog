@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
+
+    <meta charset="{{@$ENCODING}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="{{@UI}}ico/favicon.png">
+    <title>{{@blog.name}}</title>
+    <link href="{{@UI}}css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{@UI}}css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{@UI}}js/fancybox/jquery.fancybox.css" type="text/css" media="screen">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="{{@UI}}js/html5shiv.js"></script>
+    <script src="{{@UI}}js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <div class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ @BASE }}/">{{@blog.name}}</a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="{{ @BASE }}/">Home</a></li>
+                    <li><a href="admin">Admin Area</a></li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+
+    <div class="jumbotron" id="hero">
+        <div class="container">
+            <img src="ui/images/fabulog.png" alt=""/>
+        </div>
+    </div>
+
+
+    <div class="container" id="main">
+        <div class="row">
+            <div class="col-md-12">
+                <include if="{{isset(@SUBPART)}}" href="{{'templates/'.@SUBPART}}"/>
+            </div>
+            <!--<div class="col-md-4">
+                <h4>Sidebar</h4>
+                <h4>Search</h4>
+                <h4>Last Posts</h4>
+                <h4>Last Comments</h4>
+                <h4>Meta Pages</h4>
+            </div>-->
+        </div>
+        <p class="stats">{{ \Base::instance()->format('Page rendered in {0} msecs / Memory usage {1} KB',round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</p>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="{{@UI}}js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{@UI}}js/fancybox/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+    <script src="{{@UI}}js/main.js"></script>
+</body>
+</html>
