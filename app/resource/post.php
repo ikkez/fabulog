@@ -102,13 +102,13 @@ class Post extends DB_Resource {
      */
     public function getList($f3, $params) {
         $this->response->data['SUBPART'] = 'post_list.html';
-        $page = isset($params['page']) ? (int) $params['page'] : 1;
+        $page = \Pagination::findCurrentPage();
         if ($this->response instanceof \Representation\Backend) {
             // backend view
             $this->response->data['content'] = $this->paginate($page-1,25,null, array('order' => 'publish_date desc'));
         } else {
             // frontend view
-            $this->response->data['content'] = $this->addRelFilter('comments',array('approved = 1'))->
+            $this->response->data['content'] = $this->filter('comments',array('approved = 1'))->
                 paginate($page - 1, 10,array('publish_date <= ? and published = 1',date('Y-m-d')),array('order'=>'publish_date desc'));
         }
     }
@@ -144,7 +144,7 @@ class Post extends DB_Resource {
         }
         // select a post by its slugged title
         elseif(isset($params['slug'])) {
-            $this->response->data['content'] = $this->addRelFilter('comments',array('approved = 1'))->
+            $this->response->data['content'] = $this->filter('comments',array('approved = 1'))->
                 load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d')));
         }
         if ($this->dry() && !$this->response instanceof \Representation\Backend)

@@ -46,16 +46,6 @@
         "image": "",
         "teaser": ""
     },
-    "527310cb7eac15.07858585": {
-        "published": "1",
-        "slug": "new-age-rmr-architecture",
-        "title": "new age RMR architecture",
-        "publish_date": "2013-10-30",
-        "image": "res\/we-can-do-it-square.jpg",
-        "teaser": "What is RMR? And Why use it? Because:",
-        "text": "... and because it's totally awesome. <a href=\"http:\/\/www.peej.co.uk\/articles\/rmr-architecture.html\">Read more about the RMR methodology.<\/a><br><br>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<br>",
-        "author": "5266342d4a1897.26021257"
-    },
     "52741fcbd6d546.83274728": {
         "published": "1",
         "slug": "happy-birthday-fabulog",
@@ -64,6 +54,16 @@
         "image": "res\/geburtstag.jpg",
         "teaser": "fabulog is a new blog system for developers, that is quite capable in its underlaying functionality. Thanks to the php fat-free framework, that makes this possible.",
         "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<br><br><br><h2>Lorem ipsum dolor sit amet, consetetur sadipscing elitr<\/h2><br>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<br><br>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.<br>",
+        "author": "5266342d4a1897.26021257"
+    },
+    "52eee0591a1cd8.44754721": {
+        "published": "0",
+        "slug": "testy",
+        "title": "testy",
+        "publish_date": "2014-02-03",
+        "image": "",
+        "teaser": "test teaser",
+        "text": "test text<br>",
         "author": "5266342d4a1897.26021257"
     }
 }

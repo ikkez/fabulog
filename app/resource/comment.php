@@ -108,7 +108,7 @@ class Comment extends DB_Resource {
             }
         }
 
-        $page = isset($params['page']) ? (int)$params['page'] : 1;
+        $page = \Pagination::findCurrentPage();
         $limit = 3;
         $this->response->data['content'] = $this->paginate($page-1,$limit,$filter, array('order' => 'datetime asc'));
     }

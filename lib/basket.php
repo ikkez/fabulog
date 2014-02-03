@@ -1,7 +1,7 @@
 <?php
 
 /*
-	Copyright (c) 2009-2013 F3::Factory/Bong Cosca, All rights reserved.
+	Copyright (c) 2009-2014 F3::Factory/Bong Cosca, All rights reserved.
 
 	This file is part of the Fat-Free Framework (http://fatfree.sf.net).
 
@@ -72,16 +72,18 @@ class Basket {
 	}
 
 	/**
-	*	Return items that match key/value pair
+	*	Return items that match key/value pair;
+	*	If no key/value pair specified, return all items
 	*	@return array|FALSE
 	*	@param $key string
 	*	@param $val mixed
 	**/
-	function find($key,$val) {
+	function find($key=NULL,$val=NULL) {
 		if (isset($_SESSION[$this->key])) {
 			$out=array();
 			foreach ($_SESSION[$this->key] as $id=>$item)
-				if (array_key_exists($key,$item) && $item[$key]==$val) {
+				if (!isset($key) ||
+					array_key_exists($key,$item) && $item[$key]==$val) {
 					$obj=clone($this);
 					$obj->id=$id;
 					$obj->item=$item;
@@ -141,7 +143,6 @@ class Basket {
 		if (!$this->id)
 			$this->id=uniqid(NULL,TRUE);
 		$_SESSION[$this->key][$this->id]=$this->item;
-		session_commit();
 		return $this->item;
 	}
 
@@ -155,7 +156,6 @@ class Basket {
 		$found=$this->find($key,$val);
 		if ($found && $id=$found[0]->id) {
 			unset($_SESSION[$this->key][$id]);
-			session_commit();
 			if ($id==$this->id)
 				$this->reset();
 			return TRUE;
@@ -178,7 +178,6 @@ class Basket {
 	**/
 	function drop() {
 		unset($_SESSION[$this->key]);
-		session_commit();
 	}
 
 	/**

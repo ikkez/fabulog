@@ -2,6 +2,9 @@
 /** @var Base $f3 */
 $f3 = require('lib/base.php');
 
+ini_set('display_errors', 1);
+error_reporting(-1);
+
 //$f3->set('JAR.expire', time()+(60*60*2));
 
 $f3->config('app/config.ini');
@@ -23,7 +26,7 @@ $f3->set('FLASH', FlashMessage::instance());
 // view list
 $f3->route(array(
     'GET /',
-    'GET /page-@page'
+    'GET /page/@page'
    ),'Resource\Post->getList');
 // view single
 $f3->route(array(
@@ -50,7 +53,7 @@ if (\Resource\Backend::isLoggedIn()) {
     // comments
     $f3->route(array(
         'GET /admin/comment/list/@viewtype',
-        'GET /admin/comment/list/@viewtype/page-@page',
+        'GET /admin/comment/list/@viewtype/@page',
     ), 'Resource\Comment->getList');
     $f3->route('GET /admin/comment/approve/@id', 'Resource\Comment->approve');
     $f3->route('GET /admin/comment/reject/@id', 'Resource\Comment->reject');
@@ -61,8 +64,8 @@ if (\Resource\Backend::isLoggedIn()) {
     # general CRUD operations
     // create new
     $f3->route('POST /admin/@module', 'Resource\@module->post');
-    // create / update
-    $f3->route('POST /admin/@module/@id', 'Resource\@module->post');
+    // update
+    $f3->route('POST /admin/@module/save/@id', 'Resource\@module->post');
     // delete record
     $f3->route('GET /admin/@module/delete/@id', 'Resource\@module->delete');
 
@@ -72,7 +75,7 @@ if (\Resource\Backend::isLoggedIn()) {
     // view list
     $f3->route(array(
         'GET /admin/@module',
-        'GET /admin/@module/page-@page')
+        'GET /admin/@module/@page')
         , 'Resource\Backend->getList');
     // view create form
     $f3->route('GET /admin/@module/create', 'Resource\Backend->getSingle');
@@ -111,10 +114,6 @@ if (\Resource\Backend::isLoggedIn()) {
 }
 
 $f3->route('GET /logout', 'Resource\Backend->logout');
-
-$f3->route('GET /test',function( Base $f3, $params) {
-    var_dump(preg_match('/\/admin\/post($|(?=\/page))/i', '/admin/post/spage-'));
-});
 
 
 // let's cross the finger

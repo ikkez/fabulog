@@ -38,9 +38,16 @@ class Tag extends DB_Resource {
     {
         if (isset($params['slug'])) {
             $this->response = new \Representation\Frontend();
-            $this->load(array('slug = ?',$params['slug']));
+            //$this->load(array('slug = ?',$params['slug']));
+            $post = new Post();
+            //$posts = $post->find('')
+            $post->filter('comments',array('approved = 1'));
+            $post->has('tags',array('slug = ?',$params['slug']));
+            $posts = $post->find(array('publish_date <= ? and published = 1',date('Y-m-d')),array('order'=>'publish_date desc'));
+            //TODO: paginate
+            //paginate($page - 1, 10,array('publish_date <= ? and published = 1',date('Y-m-d')),array('order'=>'publish_date desc'));
             $this->response->data = array(
-                'content' => $this->post,
+                'content' => $posts,
                 'SUBPART' => 'post_tag_list.html',
             );
             $this->response->render();

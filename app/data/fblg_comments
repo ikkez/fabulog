@@ -29,7 +29,8 @@
         "author_email": "ikkez0n3@gmail.com",
         "message": "Will fabulog also support an additional markdown editor?",
         "post": "5266f2533aed92.51371759",
-        "approved": 0
+        "approved": 1,
+        "_id": "526efa1975f4b5.08717632"
     },
     "5271a3d6996863.27573211": {
         "datetime": "2013-10-31 01:27:02",
@@ -39,20 +40,20 @@
         "post": "52435747eaa228.08517434",
         "approved": 1
     },
-    "527312b78cec25.64241126": {
-        "datetime": "2013-11-01 03:32:23",
+    "52ed8372ee05c0.64307316": {
+        "datetime": "2014-02-02 00:29:54",
         "author_name": "ikkez",
         "author_email": "ikkez0n3@gmail.com",
-        "message": "awesome!",
-        "post": "527310cb7eac15.07858585",
+        "message": "testing",
+        "post": "52741fcbd6d546.83274728",
         "approved": 1
     },
-    "52751ac6417f19.16400464": {
-        "datetime": "2013-11-02 16:31:18",
-        "author_name": "ikkez",
-        "author_email": "ikkez0n3@gmail.com",
-        "message": "spam spam spam",
-        "post": "527310cb7eac15.07858585",
-        "approved": 0
+    "52ed84dc61f796.06350456": {
+        "datetime": "2014-02-02 00:35:56",
+        "author_name": "John",
+        "author_email": "asd@asd.de",
+        "message": "foo test bla spam",
+        "post": "52741fcbd6d546.83274728",
+        "approved": 2
     }
 }

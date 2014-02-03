@@ -23,11 +23,10 @@
             </a>
         </figure>
     </F3:check>
-    <div class="bodytext">
+    <div class="bodytext clearfix">
     {{@content.text}}
     </div>
-    <aside class="clearfix">
-
+    <aside>
         <section id="comment-list">
             <h3>Comments ({{ count(@content.comments) }})</h3>
             <check if="{{ @content.comments }}">
@@ -45,8 +44,8 @@
             </check>
         </section>
 
-        <h3>Leave a Comment</h3>
-        <form class="form-horizontal" role="form" action="{{ @content.slug }}" method="post">
+        <h3 id="leave-a-comment">Leave a Comment</h3>
+        <form class="form-horizontal" role="form" action="{{ @content.slug }}#leave-a-comment" method="post">
             <F3:repeat group="{{ \FlashMessage::instance()->getMessages() }}" value="{{ @msg }}">
                 <div class="alert alert-{{ @msg.status }} alert-dismissable">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>

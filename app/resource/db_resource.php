@@ -45,7 +45,7 @@ abstract class DB_Resource extends \DB\Cortex {
                 return;
             }
         }
-        $this->copyfrom('POST',true);
+        $this->copyfrom('POST',array_keys($this->fieldConf));
         $requiredError = false;
         foreach ($this->fieldConf as $name => $conf) {
             if (isset($conf['required']) && $conf['required'] == TRUE
