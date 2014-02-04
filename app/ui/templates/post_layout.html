@@ -8,7 +8,7 @@
         </a>
         <a href="admin/comment" class="list-group-item{{(is_int(strpos(@PARAMS.0,'comment'))?' active':'') }}">
 
-            <set new_comments="{{\Resource\Comment::countNew()}}"/>
+            <set new_comments="{{\Model\Comment::countNew()}}"/>
             <check if="{{ @new_comments > 0 }}">
                 <span class="badge">{{ @new_comments }}</span>
             </check>

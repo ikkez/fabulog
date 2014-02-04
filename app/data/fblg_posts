@@ -65,5 +65,15 @@
         "teaser": "test teaser",
         "text": "test text<br>",
         "author": "5266342d4a1897.26021257"
+    },
+    "52f0293d8564c5.57425943": {
+        "published": "1",
+        "slug": "switched-to-mvc",
+        "title": "Switched to MVC",
+        "publish_date": "2014-02-04",
+        "image": "",
+        "teaser": "hell yeah",
+        "text": "okay RMR was a nice try, but a MVC Pattern is more familiar.<br>",
+        "author": "5266342d4a1897.26021257"
     }
 }

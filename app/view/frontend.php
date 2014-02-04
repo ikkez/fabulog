@@ -1,8 +1,8 @@
 <?php
 
-namespace Representation;
+namespace View;
 
-class Frontend extends Representation {
+class Frontend extends Base {
 
     public function render() {
         /** @var \Base $f3 */

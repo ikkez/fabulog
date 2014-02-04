@@ -1,8 +1,8 @@
 <?php
 
-namespace Representation;
+namespace View;
 
-abstract class Representation extends \Prefab {
+abstract class Base extends \Prefab {
 
     public $data = array();
 

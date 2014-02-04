@@ -44,7 +44,7 @@
             </div>
         </div>
     </F3:check>
-    <F3:set new_comments="{{\Resource\Comment::countNew()}}"/>
+    <F3:set new_comments="{{\Model\Comment::countNew()}}"/>
     <div id="comment-widget" class="panel {{@new_comments>0?'panel-info':'panel-default'}}">
         <div class="panel-heading">
             <h3 class="panel-title">Comments</h3>

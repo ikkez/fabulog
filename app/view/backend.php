@@ -1,8 +1,8 @@
 <?php
 
-namespace Representation;
+namespace View;
 
-class Backend extends Representation {
+class Backend extends Base {
 
     protected
         $template = 'templates/layout.html';

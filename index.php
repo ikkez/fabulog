@@ -27,60 +27,60 @@ $f3->set('FLASH', FlashMessage::instance());
 $f3->route(array(
     'GET /',
     'GET /page/@page'
-   ),'Resource\Post->getList');
+   ),'Controller\Post->getList');
 // view single
 $f3->route(array(
     'GET /@slug',
     'GET /post/@id'
-   ), 'Resource\Post->getSingle');
+   ), 'Controller\Post->getSingle');
 // post comment
-$f3->route('POST /@slug', 'Resource\Post->addComment');
+$f3->route('POST /@slug', 'Controller\Post->addComment');
 
 ## TAGS
 $f3->route(array(
     'GET /tag [ajax]',
     'GET /tag/@slug'
-   ),'Resource\Tag->getList');
+   ),'Controller\Tag->getList');
 
 
 ///////////////
 //  backend  //
 ///////////////
 
-if (\Resource\Backend::isLoggedIn()) {
+if (\Controller\Backend::isLoggedIn()) {
 
     # specific routes
     // comments
     $f3->route(array(
         'GET /admin/comment/list/@viewtype',
         'GET /admin/comment/list/@viewtype/@page',
-    ), 'Resource\Comment->getList');
-    $f3->route('GET /admin/comment/approve/@id', 'Resource\Comment->approve');
-    $f3->route('GET /admin/comment/reject/@id', 'Resource\Comment->reject');
+    ), 'Controller\Comment->getList');
+    $f3->route('GET /admin/comment/approve/@id', 'Controller\Comment->approve');
+    $f3->route('GET /admin/comment/reject/@id', 'Controller\Comment->reject');
     // posts
-    $f3->route('GET /admin/post/publish/@id', 'Resource\Post->publish');
-    $f3->route('GET /admin/post/hide/@id', 'Resource\Post->hide');
+    $f3->route('GET /admin/post/publish/@id', 'Controller\Post->publish');
+    $f3->route('GET /admin/post/hide/@id', 'Controller\Post->hide');
 
     # general CRUD operations
     // create new
-    $f3->route('POST /admin/@module', 'Resource\@module->post');
+    $f3->route('POST /admin/@module', 'Controller\@module->post');
     // update
-    $f3->route('POST /admin/@module/save/@id', 'Resource\@module->post');
+    $f3->route('POST /admin/@module/save/@id', 'Controller\@module->post');
     // delete record
-    $f3->route('GET /admin/@module/delete/@id', 'Resource\@module->delete');
+    $f3->route('GET /admin/@module/delete/@id', 'Controller\@module->delete');
 
     # general forms
     // dashboard
-    $f3->route('GET /admin', 'Resource\Backend->home');
+    $f3->route('GET /admin', 'Controller\Backend->home');
     // view list
     $f3->route(array(
         'GET /admin/@module',
         'GET /admin/@module/@page')
-        , 'Resource\Backend->getList');
+        , 'Controller\Backend->getList');
     // view create form
-    $f3->route('GET /admin/@module/create', 'Resource\Backend->getSingle');
+    $f3->route('GET /admin/@module/create', 'Controller\Backend->getSingle');
     // view edit form
-    $f3->route('GET /admin/@module/edit/@id', 'Resource\Backend->getSingle');
+    $f3->route('GET /admin/@module/edit/@id', 'Controller\Backend->getSingle');
 
     $f3->route('GET|POST /login', function (Base $f3) {
         $f3->reroute('/admin');
@@ -110,10 +110,10 @@ if (\Resource\Backend::isLoggedIn()) {
         $f3->reroute('/login');
     });
 
-    $f3->route('GET|POST /login','Resource\Backend->login');
+    $f3->route('GET|POST /login','Controller\Backend->login');
 }
 
-$f3->route('GET /logout', 'Resource\Backend->logout');
+$f3->route('GET /logout', 'Controller\Backend->logout');
 
 
 // let's cross the finger

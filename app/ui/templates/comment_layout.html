@@ -2,7 +2,7 @@
     <div class="list-group">
         <a href="admin/comment" class="list-group-item{{(@PARAMS.0 == '/admin/comment'?' active':'') }}">
             <i class="glyphicon glyphicon-fire"></i> New
-            <set new_comments="{{\Resource\Comment::countNew()}}"/>
+            <set new_comments="{{\Model\Comment::countNew()}}"/>
             <check if="{{ @new_comments > 0 }}">
                 <span class="badge">{{ @new_comments }}</span>
             </check>

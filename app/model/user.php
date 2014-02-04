@@ -1,8 +1,8 @@
 <?php
 
-namespace Resource;
+namespace Model;
 
-class User extends DB_Resource {
+class User extends Base {
 
     protected
         $fieldConf = array(
@@ -24,7 +24,7 @@ class User extends DB_Resource {
                 'type' => \DB\SQL\Schema::DT_VARCHAR256
             ),
             'news' => array(
-                'has-many' => array('\Resource\Post','author'),
+                'has-many' => array('\Model\Post','author'),
             ),
         ),
         $table = 'user',
@@ -83,31 +83,6 @@ class User extends DB_Resource {
             \FlashMessage::instance()->setKey('form.mail', 'has-error');
         }
         return $val;
-    }
-
-    public function getSingle($f3, $params)
-    {
-        if (isset($params['id']))
-            $this->response->data['content'] = $this->load(array('_id = ?', $params['id']));
-        if ($this->dry() && !$this->response instanceof \Representation\Backend)
-            $f3->error(404, 'User not found');
-    }
-
-    public function getList($f3,$param) {
-        $this->response->data = array(
-            'content' => $this->find(),
-        );
-    }
-
-    public function beforeroute() {
-        $this->response = \Representation\Backend::instance();
-    }
-
-    public function afterroute()
-    {
-        if (!$this->response)
-            trigger_error('No Representation has been set.');
-        echo $this->response->render();
     }
 
 }

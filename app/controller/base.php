@@ -1,14 +1,14 @@
 <?php
 
-namespace Resource;
+namespace Controller;
 
-abstract class Resource {
+abstract class Base {
 
     protected
         $response;
 
-    public function setRepresentation(\Representation $presenter) {
-        $this->response = $presenter;
+    public function setView(\View\Base $view) {
+        $this->response = $view;
     }
 
     public function getSingle($f3,$param) {

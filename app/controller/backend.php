@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Resource;
+namespace Controller;
 
-class Backend extends Resource {
+class Backend {
 
     protected
         $response;
@@ -19,14 +19,14 @@ class Backend extends Resource {
      * create a response that displays a list of module records
      */
     public function getList($f3,$params) {
-        $class = '\Resource\\'.ucfirst($params['module']);
+        $class = '\Controller\\'.ucfirst($params['module']);
         if(!class_exists($class)) {
             trigger_error('unknown module');
             return false;
         }
-        /** @var \Resource\Resource $module */
+        /** @var \Controller\Resource $module */
         $module = new $class();
-        $module->setRepresentation($this->response);
+        $module->setView($this->response);
         $module->getList($f3,$params);
         $this->response->data['SUBPART'] = $params['module'].'_list.html';
         $this->response->data['LAYOUT'] = $params['module'].'_layout.html';
@@ -36,14 +36,14 @@ class Backend extends Resource {
      * return an create/edit form for a given module
      */
     public function getSingle($f3,$params) {
-        $class = '\Resource\\'.ucfirst($params['module']);
+        $class = '\Controller\\'.ucfirst($params['module']);
         if (!class_exists($class)) {
             trigger_error('unknown module');
             return false;
         }
-        /** @var \Resource\Resource $module */
+        /** @var \Controller\Resource $module */
         $module = new $class();
-        $module->setRepresentation($this->response);
+        $module->setView($this->response);
         $module->getSingle($f3, $params);
         $this->response->data['SUBPART'] = $params['module'].'_edit.html';
         $this->response->data['LAYOUT'] = $params['module'].'_layout.html';
@@ -57,7 +57,7 @@ class Backend extends Resource {
         /** @var Base $f3 */
         $f3 = \Base::instance();
         if ($f3->exists('SESSION.user_id')) {
-            $user = new User();
+            $user = new \Model\User();
             $user->load(array('_id = ?',$f3->get('SESSION.user_id')));
             if(!$user->dry()) {
                 $f3->set('BACKEND_USER',$user);
@@ -73,7 +73,7 @@ class Backend extends Resource {
     public function login($f3,$params) {
         if ($f3->exists('POST.username') && $f3->exists('POST.password')) {
             sleep(3); // login should take a while to kick-ass brute force attacks
-            $user = new User();
+            $user = new \Model\User();
             $user->load(array('username = ?',$f3->get('POST.username')));
             if (!$user->dry()) {
                 // check hash engine
@@ -103,14 +103,14 @@ class Backend extends Resource {
     }
 
     /**
-     * init the representation
+     * init the View
      */
     public function beforeroute() {
-        $this->response = \Representation\Backend::instance();
+        $this->response = \View\Backend::instance();
     }
 
     /**
-     * kick start the representation, which finally creates the response
+     * kick start the View, which finally creates the response
      * based on our previously set content data
      */
     public function afterroute() {
