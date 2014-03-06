@@ -10,7 +10,7 @@
     Copyright (c) 2013 ~ ikkez
     Christian Knuth <ikkez0n3@gmail.com>
  
-        @version 0.1.0
+        @version 0.1.1
         @date: 31.10.13 
  **/
 
@@ -24,13 +24,13 @@ class setup {
             $f3->error(256,'no valid DB specified');
         }
         // setup the models
-        \Resource\Post::setup();
-        \Resource\Tag::setup();
-        \Resource\Comment::setup();
-        \Resource\User::setup();
+        \Model\Post::setup();
+        \Model\Tag::setup();
+        \Model\Comment::setup();
+        \Model\User::setup();
 
         // create demo admin user
-        $user = new \Resource\User();
+        $user = new \Model\User();
         $user->load(array('username = ?', 'admin'));
         if ($user->dry()) {
             $user->username = 'admin';
@@ -48,10 +48,10 @@ class setup {
     {
         die('serious?');
         // clears all tables !!!
-        \Resource\Post::setdown();
-        \Resource\Tag::setdown();
-        \Resource\Comment::setdown();
-        \Resource\User::setdown();
+        \Model\Post::setdown();
+        \Model\Tag::setdown();
+        \Model\Comment::setdown();
+        \Model\User::setdown();
         $cfg = new Config();
         $cfg->clear('ACTIVE_DB');
         $cfg->save();

@@ -22,7 +22,8 @@ class Tag extends Resource {
 			//$posts = $post->find('')
 			$post->filter('comments',array('approved = 1'));
 			$post->has('tags',array('slug = ?',$params['slug']));
-			$posts = $post->find(array('publish_date <= ? and published = 1',date('Y-m-d')),array('order'=>'publish_date desc'));
+			$posts = $post->find(array('publish_date <= ? and published = 1',date('Y-m-d')),
+				array('order'=>'publish_date desc'));
 			//TODO: paginate
 			//paginate($page - 1, 10,array('publish_date <= ? and published = 1',date('Y-m-d')),array('order'=>'publish_date desc'));
 			$this->response->data = array(

@@ -14,7 +14,7 @@ $cfg = Config::instance();
 if($cfg->ACTIVE_DB)
     $f3->set('DB', storage::instance()->get($cfg->ACTIVE_DB));
 else {
-    $f3->error(404,'Sorry, but there is no active DB setup.');
+    $f3->error(500,'Sorry, but there is no active DB setup.');
 }
 
 $f3->set('FLASH', FlashMessage::instance());

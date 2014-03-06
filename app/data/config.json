@@ -20,7 +20,6 @@
         "DB_MONGO": {
             "dsn": "mongodb:\/\/localhost:27017",
             "dbname": "fabulog"
-        },
-        "_id": "5270220ebb01b0.93149557"
+        }
     }
 }

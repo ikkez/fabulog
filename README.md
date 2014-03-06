@@ -11,5 +11,4 @@ fabulog currently has the following features:
 * Comment module with backend moderation
 * simple User management module
 * Sommernote Bootstrap WYSIWYG editor
-* build with RMR architecture
 * powered by fat-free framework
