@@ -34,14 +34,16 @@ class Post extends Resource {
 		$page = \Pagination::findCurrentPage();
 		if ($this->response instanceof \View\Backend) {
 			// backend view
-			$this->response->data['content'] = $this->resource->paginate($page - 1, 25, null,
-				array('order' => 'publish_date desc'));
+			$records = $this->resource->paginate($page-1,25,null,
+				array('order'=>'publish_date desc'));
 		} else {
 			// frontend view
-			$this->response->data['content'] = $this->resource->filter('comments', array('approved = 1'))->
-				paginate($page - 1, 10, array('publish_date <= ? and published = 1', date('Y-m-d')),
-					array('order' => 'publish_date desc'));
+			$this->resource->filter('comments', array('approved = 1'));
+			$records = $this->resource->paginate($page-1,10,
+				array('publish_date <= ? and published = 1', date('Y-m-d')),
+				array('order' => 'publish_date desc'));
 		}
+		$this->response->data['content'] = $records;
 	}
 
 	/**
@@ -69,15 +71,20 @@ class Post extends Resource {
 			$f3->set('ASSETS.JS.fileupload', $ui.'js/jquery.fileupload.js');
 			$f3->set('ASSETS.CSS.fileupload', $ui.'css/jquery.fileupload.css');
 		}
+
+		// only show approved comments in the next query
+//		$this->resource->filter('comments', array('approved = 1'));
+
 		// select a post by its ID
 		if (isset($params['id'])) {
-			$this->response->data['content'] = $this->resource->load(
-				array('_id = ?'.$addQuery, $params['id'], date('Y-m-d')));
-		} // select a post by its slugged title
-		elseif (isset($params['slug'])) {
-			$this->response->data['content'] = $this->resource->filter('comments', array('approved = 1'))->
-				load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d')));
+			$this->resource->load(array('_id = ?'.$addQuery, $params['id'], date('Y-m-d')));
 		}
+		// select a post by its slugged title
+		elseif (isset($params['slug'])) {
+			$this->resource->load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d')));
+		}
+		$this->response->data['content'] = $this->resource;
+
 		if ($this->resource->dry() && !$this->response instanceof \View\Backend)
 			$f3->error(404, 'Post not found');
 	}
@@ -150,10 +157,5 @@ class Post extends Resource {
 	public function beforeroute()
 	{
 		$this->response = \View\Frontend::instance();
-	}
-
-	public function afterroute()
-	{
-		echo $this->response->render();
 	}
 } 

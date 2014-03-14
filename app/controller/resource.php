@@ -13,7 +13,14 @@ abstract class Resource extends Base {
 	public function __construct(\Model\Base $model)
 	{
 		$this->resource = $model;
-//		parent::__construct();
+	}
+
+	public function getSingle($f3,$param) {
+		$f3->error(403);
+	}
+
+	public function getList($f3,$param) {
+		$f3->error(403);
 	}
 
 	public function post($f3, $params)

@@ -28,7 +28,7 @@ class Backend extends Base {
         $f3 = \Base::instance();
         if ($f3->get('AJAX')) {
             // if this is an ajax request, respond a JSON string
-            echo json_encode($this->$data);
+            echo json_encode($this->data);
         } else {
             // add template data to F3 hive
             if($this->data)

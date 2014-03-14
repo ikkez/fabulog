@@ -7,11 +7,26 @@ error_reporting(-1);
 
 //$f3->set('JAR.expire', time()+(60*60*2));
 
+// preflight system check
+if (!is_dir($f3->get('TEMP')) || !is_writable($f3->get('TEMP')))
+	$preErr[] = sprintf('please make sure that the \'%s\' directory is existing and writable.',$f3->get('TEMP'));
+if (!is_writable('res/'))
+	$preErr[] = sprintf('please make sure that the \'%s\' directory is writable.','res/');
+if (!is_writable('app/data/'))
+	$preErr[] = sprintf('please make sure that the \'%s\' directory is writable.','app/data/');
+if (!is_writable('app/data/config.json'))
+	$preErr[] = sprintf('please make sure that the \'%s\' file is writable.','app/data/config.json');
+
+if(isset($preErr)) {
+	header('Content-Type: text;');
+	die(implode("\n",$preErr));
+}
+
 $f3->config('app/config.ini');
 
 ## DB Setup
 $cfg = Config::instance();
-if($cfg->ACTIVE_DB)
+if ($cfg->ACTIVE_DB)
     $f3->set('DB', storage::instance()->get($cfg->ACTIVE_DB));
 else {
     $f3->error(500,'Sorry, but there is no active DB setup.');
@@ -47,7 +62,7 @@ $f3->route(array(
 //  backend  //
 ///////////////
 
-if (\Controller\Backend::isLoggedIn()) {
+if (\Controller\Auth::isLoggedIn()) {
 
     # specific routes
     // comments
@@ -62,16 +77,14 @@ if (\Controller\Backend::isLoggedIn()) {
     $f3->route('GET /admin/post/hide/@id', 'Controller\Post->hide');
 
     # general CRUD operations
-    // create new
+    // create record
     $f3->route('POST /admin/@module', 'Controller\@module->post');
-    // update
+    // update record
     $f3->route('POST /admin/@module/save/@id', 'Controller\@module->post');
     // delete record
     $f3->route('GET /admin/@module/delete/@id', 'Controller\@module->delete');
 
     # general forms
-    // dashboard
-    $f3->route('GET /admin', 'Controller\Backend->home');
     // view list
     $f3->route(array(
         'GET /admin/@module',
@@ -82,10 +95,16 @@ if (\Controller\Backend::isLoggedIn()) {
     // view edit form
     $f3->route('GET /admin/@module/edit/@id', 'Controller\Backend->getSingle');
 
+    // dashboard
+    $f3->route('GET /admin', 'Controller\Backend->home');
+
+    // settings panel
+    $f3->route('GET /admin/settings', 'Controller\Settings->view');
+
+    // no auth again
     $f3->route('GET|POST /login', function (Base $f3) {
         $f3->reroute('/admin');
     });
-
 
     // setup DB
     $f3->route('GET /install/@type', 'setup->install');
@@ -110,10 +129,10 @@ if (\Controller\Backend::isLoggedIn()) {
         $f3->reroute('/login');
     });
 
-    $f3->route('GET|POST /login','Controller\Backend->login');
+    $f3->route('GET|POST /login','Controller\Auth->login');
 }
 
-$f3->route('GET /logout', 'Controller\Backend->logout');
+$f3->route('GET /logout', 'Controller\Auth->logout');
 
 
 // let's cross the finger

@@ -25,15 +25,4 @@ class User extends Resource {
 		);
 	}
 
-	public function beforeroute() {
-		$this->response = \View\Backend::instance();
-	}
-
-	public function afterroute()
-	{
-		if (!$this->response)
-			trigger_error('No View has been set.');
-		echo $this->response->render();
-	}
-
 }

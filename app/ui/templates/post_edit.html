@@ -72,7 +72,7 @@
                     <div id="taglist"></div>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
-                        <input type="text" name="tags" placeholder="Tag Name" class="form-control tm-input" id="input-tags" data-value="{{(isset(@content) && is_object(@content.tags))? implode(',',@content.tags->getAll('title')) :''}}">
+                        <input type="text" name="tags" placeholder="Tag Name" class="form-control tm-input" id="input-tags" data-value="{{(isset(@content) && !@content->dry() && is_object(@content.tags))? implode(',',@content.tags->getAll('title')) :''}}">
                     </div>
                 </div>
             </div>

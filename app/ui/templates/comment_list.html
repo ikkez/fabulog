@@ -1,6 +1,6 @@
 <h2>Comment list</h2>
 
-<F3:check if="{{ !@content}}">
+<F3:check if="{{ !@content || @content.total == 0 }}">
     <div class="solid">
     <div class="alert alert-info">You have no comments in this list.</div>
     </div>

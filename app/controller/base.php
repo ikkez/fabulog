@@ -4,26 +4,31 @@ namespace Controller;
 
 abstract class Base {
 
-    protected
-        $response;
+	protected
+		$response;
 
-    public function setView(\View\Base $view) {
-        $this->response = $view;
-    }
+	/**
+	 * set a new view
+	 * @param \View\Base $view
+	 */
+	public function setView(\View\Base $view) {
+		$this->response = $view;
+	}
 
-    public function getSingle($f3,$param) {
-        $f3->error(403);
-    }
+	/**
+	 * init the View
+	 */
+	public function beforeroute() {
+		$this->response = \View\Backend::instance();
+	}
 
-    public function getList($f3,$param) {
-        $f3->error(403);
-    }
-
-    public function post($f3,$param) {
-        $f3->error(403);
-    }
-
-    public function delete($f3,$param) {
-        $f3->error(403);
-    }
+	/**
+	 * kick start the View, which finally creates the response
+	 * based on our previously set content data
+	 */
+	public function afterroute() {
+		if (!$this->response)
+			trigger_error('No View has been set.');
+		echo $this->response->render();
+	}
 }

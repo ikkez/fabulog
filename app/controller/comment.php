@@ -63,15 +63,7 @@ class Comment extends Resource {
 		$page = \Pagination::findCurrentPage();
 		$limit = 3;
 		$this->response->data['content'] =
-			$this->resource->paginate($page-1,$limit,$filter, array('order' => 'datetime asc'));
-	}
-
-	public function beforeroute() {
-		$this->response = \View\Backend::instance();
-	}
-
-	public function afterroute() {
-		echo $this->response->render();
+			$this->resource->paginate($page-1,$limit,$filter, array('order' => 'datetime desc'));
 	}
 
 }
