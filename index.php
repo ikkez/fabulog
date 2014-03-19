@@ -32,6 +32,7 @@ else {
     $f3->error(500,'Sorry, but there is no active DB setup.');
 }
 
+$f3->set('CONFIG', $cfg);
 $f3->set('FLASH', FlashMessage::instance());
 
 \Template::instance()->extend('image','\ImageViewHelper::render');
@@ -95,21 +96,22 @@ if (\Controller\Auth::isLoggedIn()) {
     // view edit form
     $f3->route('GET /admin/@module/edit/@id', 'Controller\Backend->getSingle');
 
+
+//	$f3->route('GET /admin/@module', 'Controller\@module->getSingle');
+//	$f3->route('GET /admin/@module/@action', 'Controller\@module->@action');
+//	$f3->route('GET /admin/@module/@action/@id', 'Controller\@module->@action');
+
     // dashboard
-    $f3->route('GET /admin', 'Controller\Backend->home');
+    $f3->route('GET /admin', 'Controller\Dashboard->main');
 
     // settings panel
-    $f3->route('GET /admin/settings', 'Controller\Settings->view');
+    $f3->route('GET|POST /admin/settings', 'Controller\Settings->general');
+    $f3->route('GET|POST /admin/settings/@type', 'Controller\Settings->@type');
 
     // no auth again
     $f3->route('GET|POST /login', function (Base $f3) {
         $f3->reroute('/admin');
     });
-
-    // setup DB
-    $f3->route('GET /install/@type', 'setup->install');
-    // uninstall, who would ever need this? :D
-    $f3->route('GET /uninstall', 'setup->uninstall');
 
     // upload file
     $f3->route('POST /admin/file [ajax]', function ($f3) {

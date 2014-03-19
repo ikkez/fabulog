@@ -29,7 +29,7 @@
                 <div class="header clearfix">
                     <a href="admin/" ><img src="app/ui/images/fabulog-small.png"/></a>
                 </div>
-                <form role="form" method="post" action="{{@ssl_backend?'https://'.@HOST.@BASE.'/login':'login'}}" id="login-form">
+                <form role="form" method="post" action="{{@CONFIG.ssl_backend?'https://'.@HOST.@BASE.'/login':'login'}}" id="login-form">
                     <div class="form-group">
                         <label class="control-label" for="inputUser">Username</label>
                         <input type="text" class="form-control" id="inputUser" name="username" value="{{isset(@POST.username)?@POST.username:''}}">

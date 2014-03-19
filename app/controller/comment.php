@@ -48,12 +48,12 @@ class Comment extends Resource {
 	{
 		$this->response->data['SUBPART'] = 'comment_list.html';
 		$this->response->data['LAYOUT'] = 'comment_layout.html';
-		$filter = array('approved = 0'); // new
+		$filter = array('approved = ?',0); // new
 		if (isset($params['viewtype'])) {
 			if ($params['viewtype'] == 'published')
-				$filter = array('approved = 1');
+				$filter = array('approved = ?',1);
 			elseif ($params['viewtype'] == 'rejected')
-				$filter = array('approved = 2');
+				$filter = array('approved = ?',2);
 			elseif(!empty($params['viewtype'])) {
 				// display all comments for a specified post
 				$filter = array('post = ?',$params['viewtype']);

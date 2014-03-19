@@ -5,7 +5,7 @@
     <meta charset="{{@$ENCODING}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{@UI}}ico/favicon.png">
-    <title>{{@blog.name}} - fabulog backend</title>
+    <title>{{@CONFIG.blog_title}} - fabulog backend</title>
     <link href="{{@UI}}css/bootstrap.min.css" rel="stylesheet">
     <link href="{{@UI}}css/backend.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -29,7 +29,7 @@
                 <div class="header clearfix">
                     <a href="admin/" ><img src="app/ui/images/fabulog-small.png"/></a>
                 </div>
-                <form role="form" method="post" action="{{@ssl_backend?'https://'.@HOST.@BASE.'/login':'login'}}" id="login-form">
+                <form role="form" method="post" action="{{@CONFIG.ssl_backend?'https://'.@HOST.@BASE.'/login':'login'}}" id="login-form">
                     <div class="form-group">
                         <label class="control-label" for="inputUser">Username</label>
                         <input type="text" class="form-control" id="inputUser" name="username" value="{{isset(@POST.username)?@POST.username:''}}">

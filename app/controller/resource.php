@@ -10,8 +10,7 @@ abstract class Resource extends Base {
 	/** @var \View\Base */
 	protected $response;
 
-	public function __construct(\Model\Base $model)
-	{
+	public function __construct(\Model\Base $model) {
 		$this->resource = $model;
 	}
 
@@ -23,8 +22,7 @@ abstract class Resource extends Base {
 		$f3->error(403);
 	}
 
-	public function post($f3, $params)
-	{
+	public function post($f3, $params) {
 		$msg = \FlashMessage::instance();
 		$this->resource->reset();
 		if (isset($params['id'])) {
@@ -66,8 +64,7 @@ abstract class Resource extends Base {
 		}
 	}
 
-	public function delete($f3, $params)
-	{
+	public function delete($f3, $params) {
 		$this->resource->reset();
 		$msg = \FlashMessage::instance();
 		if (isset($params['id'])) {

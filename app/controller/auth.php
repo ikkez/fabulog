@@ -46,7 +46,7 @@ class Auth extends Base {
                 if($valid) {
                     $f3->clear('SESSION'); //recreate session id
                     $f3->set('SESSION.user_id',$user->_id);
-                    if($f3->get('ssl_backend'))
+                    if($f3->get('CONFIG.ssl_backend'))
                         $f3->reroute('https://'.$f3->get('HOST').$f3->get('BASE').'/admin');
                     else $f3->reroute('/admin');
                 }

@@ -2,24 +2,32 @@
     "5270220ebb01b0.93149557": {
         "ACTIVE_DB": "JIG",
         "DB_JIG": {
-            "dir": "app\/data\/"
+            "dir": "app\/data\/",
+            "format": "0"
         },
         "DB_MYSQL": {
-            "dsn": "mysql:host=localhost;port=3306;dbname=fatfree",
             "user": "fatfree",
-            "password": ""
+            "password": "",
+            "host": "localhost",
+            "port": "3306",
+            "dbname": "fatfree"
         },
         "DB_SQLITE": {
-            "dsn": "sqlite:app\/data\/fblog_sqlite.db"
+            "path": "app\/data\/fblog_sqlite.db"
         },
         "DB_PGSQL": {
-            "dsn": "pgsql:host=localhost;dbname=fatfree",
             "user": "fatfree",
-            "password": "fatfree"
+            "password": "fatfree",
+            "host": "localhost",
+            "dbname": "fatfree"
         },
         "DB_MONGO": {
-            "dsn": "mongodb:\/\/localhost:27017",
+            "host": "localhost",
+            "port": "27017",
             "dbname": "fabulog"
-        }
+        },
+        "blog_title": "fabulog blogware",
+        "ssl_backend": false,
+        "auto_approve_comments": false
     }
 }

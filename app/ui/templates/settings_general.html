@@ -1,0 +1,37 @@
+<h2>Settings: General</h2>
+
+<div class="row solid">
+        <form id="form" action="admin/settings/general" method="post" role="form">
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label>Blog Title</label>
+                    <input value="{{(isset(@CONFIG.blog_title)?@CONFIG.blog_title:'')}}" type="text" name="title" class="form-control" placeholder="The title of your blog" />
+                </div>
+
+                <div class="form-group">
+                        <label>SSL Backend</label>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="ssl_backend" value="1" {{((isset(@CONFIG->ssl_backend) && @CONFIG->ssl_backend==1)?'checked':'')}}>
+                                switch to SSL connection on backend login
+                            </label>
+                        </div>
+                </div>
+
+                <div class="form-group">
+                        <label>auto approve comments</label>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="auto_approve_comments" value="1" {{((isset(@CONFIG->auto_approve_comments) && @CONFIG->auto_approve_comments==1)?'checked':'')}}>
+                                if checked, comments immediately appears after posting
+                                otherwise you need to approve them first manually
+                            </label>
+                        </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+
+        </form>
+</div>

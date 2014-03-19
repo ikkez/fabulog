@@ -4,8 +4,8 @@ namespace Controller;
 
 abstract class Base {
 
-	protected
-		$response;
+	/** @var \View\Base */
+	protected $response;
 
 	/**
 	 * set a new view

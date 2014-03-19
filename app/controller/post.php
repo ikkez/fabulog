@@ -38,9 +38,9 @@ class Post extends Resource {
 				array('order'=>'publish_date desc'));
 		} else {
 			// frontend view
-			$this->resource->filter('comments', array('approved = 1'));
+			$this->resource->filter('comments', array('approved = ?',1));
 			$records = $this->resource->paginate($page-1,10,
-				array('publish_date <= ? and published = 1', date('Y-m-d')),
+				array('publish_date <= ? and published = ?', date('Y-m-d'), 1),
 				array('order' => 'publish_date desc'));
 		}
 		$this->response->data['content'] = $records;
@@ -55,7 +55,7 @@ class Post extends Resource {
 		$addQuery = '';
 		// only show published posts, except in backend
 		if (!$this->response instanceof \View\Backend)
-			$addQuery = ' and publish_date <= ? and published = 1';
+			$addQuery = ' and publish_date <= ? and published = ?';
 		else {
 			$ui = $f3->get('BACKEND_UI');
 			if ($f3->get('text_editor') == 'sommernote') {
@@ -72,16 +72,16 @@ class Post extends Resource {
 			$f3->set('ASSETS.CSS.fileupload', $ui.'css/jquery.fileupload.css');
 		}
 
-		// only show approved comments in the next query
-//		$this->resource->filter('comments', array('approved = 1'));
+		// show only approved comments in the next query
+		$this->resource->filter('comments', array('approved = ?', 1));
 
 		// select a post by its ID
 		if (isset($params['id'])) {
-			$this->resource->load(array('_id = ?'.$addQuery, $params['id'], date('Y-m-d')));
+			$this->resource->load(array('_id = ?'.$addQuery, $params['id'], date('Y-m-d'), 1));
 		}
 		// select a post by its slugged title
 		elseif (isset($params['slug'])) {
-			$this->resource->load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d')));
+			$this->resource->load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d'), 1));
 		}
 		$this->response->data['content'] = $this->resource;
 
@@ -107,8 +107,8 @@ class Post extends Resource {
 	{
 		if (isset($params['slug'])) {
 			// you may only comment published posts
-			$this->resource->load(array('slug = ? and publish_date <= ? and published = 1',
-							  $params['slug'], date('Y-m-d')));
+			$this->resource->load(array('slug = ? and publish_date <= ? and published = ?',
+							  $params['slug'], date('Y-m-d'), 1));
 			if ($this->resource->dry()) {
 				// invalid post ID
 				$f3->error(404, 'Post not found.');
@@ -117,7 +117,7 @@ class Post extends Resource {
 			$comment = new \Model\Comment();
 			if ($comment->addToPost($this->resource->_id)) {
 				// if posting was successful, reroute to the post view
-				if ($f3->get('auto_approve_comments'))
+				if (\Config::instance()->get('auto_approve_comments'))
 					\FlashMessage::instance()->addMessage('Your comment has been added.',
 						'success');
 				else

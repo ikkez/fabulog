@@ -57,13 +57,13 @@ class Comment extends Base {
         $this->set('author_email',$f3->get('POST.author_email'));
         $this->set('message',$f3->get('POST.message'));
         $this->set('post', $postID);
-        $this->set('approved', $f3->get('auto_approve_comments') ? 1 : 0 );
+        $this->set('approved', \Config::instance()->get('auto_approve_comments') ? 1 : 0 );
         return $this->save();
     }
 
     static public function countNew() {
         $comments = new self;
-        return $comments->count(array('approved = 0'));
+        return $comments->count(array('approved = ?',0));
     }
 
 }

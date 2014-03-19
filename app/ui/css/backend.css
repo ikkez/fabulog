@@ -17,7 +17,8 @@ body {
     /*background: rgba(46, 51, 56,0.8);*/
 }
 .solid {
-    margin: 10px 0;
+    /*margin: 10px 0;*/
+    margin-bottom: 10px;
     padding: 10px;
     background: rgba(255,255,255,0.65);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -143,3 +144,8 @@ body {
 #upload-btn {
     margin-top: 20px;
 }
+
+/*db-select > div {
+    float: left;
+    margin-right: 10px;
+}*/
