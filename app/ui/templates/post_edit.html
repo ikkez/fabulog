@@ -93,6 +93,23 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group">
+                <div class="col-sm-6">
+                    <label>Allow comments</label>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="enable_comments" value="0" {{((isset(@content.enable_comments) && @content.enable_comments==0)?'checked':'')}}>
+                            No
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="enable_comments" value="1" {{((isset(@content.enable_comments) && @content.enable_comments==1)?'checked':'')}}>
+                            Yes
+                        </label>
+                    </div>
+                </div>
+            </div>
 
 
             <button type="submit" class="btn btn-primary">Save</button>

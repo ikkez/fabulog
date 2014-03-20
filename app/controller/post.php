@@ -114,6 +114,10 @@ class Post extends Resource {
 				$f3->error(404, 'Post not found.');
 				return false;
 			}
+			if ($this->resource->enable_comments == false) {
+				$f3->error(403, 'Comments are not allowed for this Post');
+				return false;
+			}
 			$comment = new \Model\Comment();
 			if ($comment->addToPost($this->resource->_id)) {
 				// if posting was successful, reroute to the post view

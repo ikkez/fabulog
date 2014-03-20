@@ -47,17 +47,12 @@ class Settings extends Base {
 			$cfg = \Config::instance();
 			$type = $f3->get('POST.active_db');
 			$cfg->{'DB_'.$type} = $f3->get('POST.'.$type);
+			$cfg->ACTIVE_DB = $type;
 
-			if($cfg->ACTIVE_DB == $type) {
-				$cfg->save();
-				\FlashMessage::instance()->addMessage('Config saved','success');
-			} else {
-				$cfg->ACTIVE_DB = $type;
-				$cfg->save();
-				\FlashMessage::instance()->addMessage('Config saved','success');
-				$setup = new \Setup();
-				$setup->install($type);
-			}
+			$cfg->save();
+			\FlashMessage::instance()->addMessage('Config saved','success');
+			$setup = new \Setup();
+			$setup->install($type);
 
 		}
 

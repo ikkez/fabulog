@@ -26,6 +26,7 @@
     <div class="bodytext clearfix">
     {{@content.text}}
     </div>
+    <F3:check if="{{ (isset(@content.enable_comments) && @content.enable_comments == 1) || !isset(@content.enable_comments) }}">
     <aside>
         <section id="comment-list">
             <h3>Comments ({{ count(@content.comments) }})</h3>
@@ -74,4 +75,5 @@
 
         </form>
     </aside>
+    </F3:check>
 </article>
