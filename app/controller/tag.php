@@ -43,6 +43,8 @@ class Tag extends Resource {
 					'id' => $tag->_id,
 				);
 			}
+			header('Content-Type: application/json');
+			die(json_encode($return));
 		}
 	}
 }
