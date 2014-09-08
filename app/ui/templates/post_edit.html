@@ -23,7 +23,7 @@
                     <label for="input-date">Publish Date</label>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                        <input type="text" name="publish_date" class="form-control datepicker" id="input-date" value="{{isset(@content.publish_date) ? date('d.m.Y',strtotime(@content.publish_date)) : date('d.m.Y')}}">
+                        <input type="text" name="publish_date" class="form-control datepicker" id="input-date" value="{{!empty(@content.publish_date) ? date('d.m.Y',strtotime(@content.publish_date)) : date('d.m.Y')}}">
                     </div>
                 </div>
             </div>

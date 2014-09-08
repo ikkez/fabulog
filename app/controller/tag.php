@@ -20,7 +20,7 @@ class Tag extends Resource {
 			$post = new \Model\Post();
 			$post->filter('comments',array('approved = 1'));
 			$post->has('tags',array('slug = ?',$params['slug']));
-			$posts = $post->find(array('publish_date <= ? and published = 1',date('Y-m-d')),
+			$posts = $post->find(array('publish_date <= ? and published = ?',date('Y-m-d'),1),
 				array('order'=>'publish_date desc'));
 			//TODO: paginate
 			//paginate($page - 1, 10,array('publish_date <= ? and published = 1',date('Y-m-d')),array('order'=>'publish_date desc'));
