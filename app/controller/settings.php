@@ -54,6 +54,7 @@ class Settings extends Base {
 			$setup = new \Setup();
 			$setup->install($type);
 
+			$f3->clear('SESSION.user_id');
 		}
 
 	}
