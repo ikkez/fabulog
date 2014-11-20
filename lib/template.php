@@ -49,6 +49,19 @@ class Template extends Preview {
 	**/
 	protected function _include(array $node) {
 		$attrib=$node['@attrib'];
+		$hive=isset($attrib['with']) &&
+			($attrib['with']=$this->token($attrib['with'])) &&
+			preg_match_all('/(\w+)\h*=\h*(.+?)(?=,|$)/',
+				$attrib['with'],$pairs,PREG_SET_ORDER)?
+					'array('.implode(',',
+						array_map(function($pair) {
+							return '\''.$pair[1].'\'=>'.
+								(preg_match('/^\'.*\'$/',$pair[2]) ||
+									preg_match('/\$/',$pair[2])?
+									$pair[2]:
+									\Base::instance()->stringify($pair[2]));
+						},$pairs)).')+get_defined_vars()':
+					'get_defined_vars()';
 		return
 			'<?php '.(isset($attrib['if'])?
 				('if ('.$this->token($attrib['if']).') '):'').
@@ -56,7 +69,7 @@ class Template extends Preview {
 					(preg_match('/\{\{(.+?)\}\}/',$attrib['href'])?
 						$this->token($attrib['href']):
 						Base::instance()->stringify($attrib['href'])).','.
-					'$this->mime,get_defined_vars()); ?>');
+					'$this->mime,'.$hive.'); ?>');
 	}
 
 	/**
@@ -285,7 +298,7 @@ class Template extends Preview {
 						// Process attributes
 						preg_match_all(
 							'/(?:\b([\w-]+)\h*'.
-							'(?:=\h*(?:"(.+?)"|\'(.+?)\'))?|'.
+							'(?:=\h*(?:"(.*?)"|\'(.*?)\'))?|'.
 							'(\{\{.+?\}\}))/s',
 							$match[3],$attr,PREG_SET_ORDER);
 						foreach ($attr as $kv)
@@ -293,8 +306,10 @@ class Template extends Preview {
 								$node['@attrib'][]=$kv[4];
 							else
 								$node['@attrib'][$kv[1]]=
-									(empty($kv[2])?
-										(empty($kv[3])?NULL:$kv[3]):$kv[2]);
+									(isset($kv[2]) && $kv[2]!==''?
+										$kv[2]:
+										(isset($kv[3]) && $kv[3]!==''?
+											$kv[3]:NULL));
 					}
 					if ($match[4])
 						// Empty tag

@@ -8,10 +8,11 @@
     can be waived if you get permission from the copyright holder.
 
     Copyright (c) 2013 by ikkez
-    Christian Knuth <mail@ikkez.de>
+    Christian Knuth <ikkez0n3@gmail.com>
  
-        @version 0.5.0
-        @date: 24.04.13 
+        @version 0.5.2
+        @since: 24.04.13
+        @date: 18.11.13
  **/
 
 class Router extends Prefab {
@@ -30,7 +31,7 @@ class Router extends Prefab {
             trigger_error('set multiple routes are not supported');
         $f3 = \Base::instance();
         $expl = explode(' ', $pattern, 2);
-        if ($expl[0] === 'MAP')
+        if ($expl[0] == 'MAP')
             $f3->map($expl[1], $handler, $ttl, $kbps);
         else
             $f3->route($pattern,$handler,$ttl,$kbps);
@@ -45,6 +46,7 @@ class Router extends Prefab {
      */
     public function getNamedRoute($name, $params = null)
     {
+        /** @var \Base $f3 */
         $f3 = \Base::instance();
         $routes = $f3->get('ROUTES');
         foreach($routes as $path=>$route)
@@ -54,13 +56,11 @@ class Router extends Prefab {
             }
         if (!isset($match))
             return false;
-        if(!empty($params)) {
-            $params = array_flip($params);
-            foreach($params as $val=>&$token)
-                $token='@'.$token;
-            $match = str_replace(array_values($params),array_keys($params),$match);
-        }
-        return $match;
+        if(!empty($params))
+            foreach($params as $token=>$val)
+                $match = preg_replace('/@\b'.$token.'\b/', $val, $match);
+        $base = $f3->exists('ROUTER.basePath') ? $f3->get('ROUTER.basePath') : '';
+        return $base.$match;
     }
 
     /**
@@ -73,12 +73,13 @@ class Router extends Prefab {
         $attrib = $node['@attrib'];
         $params = '';
         $queryString = '';
+        /** @var \Template $tmp */
+        $tmp = \Template::instance();
         if(array_key_exists('route', $attrib)) {
             if (array_key_exists('href', $attrib))
                 unset($attrib['href']);
             $r_params = array();
             // process tokens
-            $tmp = \Template::instance();
             $route_name = $attrib['route'];
             $absolute = 0;
             $addQueryString = false;
@@ -86,6 +87,8 @@ class Router extends Prefab {
             if (preg_match('/{{(.+?)}}/s', $route_name))
                 $dyn_route_name = $tmp->token($route_name);
             foreach ($attrib as $key => $value) {
+                if (is_numeric($key))
+                    continue;
                 // fetch route token parameters
                 if (is_int(strpos($key, 'param-'))) {
                     if (isset($dyn_route_name)) {
@@ -96,7 +99,7 @@ class Router extends Prefab {
                         $r_params[] = "'".substr($key, 6)."'=>$value";
                     } else {
                         if (preg_match('/{{(.+?)}}/s', $value))
-                            $value = "<?php echo ".$tmp->token($value).";?>";
+                            $value = $tmp->build($value);
                         $r_params[substr($key, 6)] = $value;
                     }
                     unset($attrib[$key]);
@@ -104,8 +107,9 @@ class Router extends Prefab {
                 // fetch query string
                 elseif ($key == 'query') {
                     if (preg_match('/{{(.+?)}}/s', $value))
-                        $queryString .= '<?php $qvar = '.$tmp->token($value).'; '.
-                            'echo (is_array($qvar)?htmlentities(http_build_query($qvar)):$qvar);?>';
+                        $queryString .= '<?php echo (is_array('.$tmp->token($value).')?'.
+                            'htmlentities(http_build_query('.$tmp->token($value).')):'.
+                            $tmp->token($value).');?>';
                     else
                         $queryString .= htmlentities($value);
                     unset($attrib[$key]);
@@ -131,7 +135,7 @@ class Router extends Prefab {
                 }
                 elseif ($key == 'section') {
                     if (preg_match('/{{(.+?)}}/s', $value))
-                        $section = '<?php echo '.$tmp->token($value).';?>';
+                        $section = $tmp->build($value);
                     else
                         $section = htmlentities($value);
                     unset($attrib[$key]);
@@ -165,8 +169,21 @@ class Router extends Prefab {
                 $attrib['href'] .= '#'.$section;
             unset($attrib['route']);
         }
-        foreach ($attrib as $key => $value)
-            $params .= ' '.$key.'="'.$value.'"';
+        foreach ($attrib as $key => $value) {
+            // find dynamic tokens
+            if (preg_match('/{{(.+?)}}/s', $value))
+                $value = $tmp->build($value);
+            if (preg_match('/{{(.+?)}}/s', $key))
+                $key = $tmp->build($key);
+            if (is_numeric($key))
+                // inline token
+                $params .= ' '.$value;
+            elseif($value==NULL)
+                // value-less parameter
+                $params .= ' '.$key;
+            else
+                $params .= ' '.$key.'="'.$value.'"';
+        }
         return '<a'.$params.'>'.$node[0].'</a>';
     }
 

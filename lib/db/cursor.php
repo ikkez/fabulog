@@ -16,7 +16,7 @@
 namespace DB;
 
 //! Simple cursor implementation
-abstract class Cursor extends \Magic {
+abstract class Cursor extends \Magic implements \IteratorAggregate {
 
 	//@{ Error messages
 	const
@@ -36,6 +36,12 @@ abstract class Cursor extends \Magic {
 	*	@return string
 	**/
 	abstract function dbtype();
+
+	/**
+	*	Return field names
+	*	@return array
+	**/
+	abstract function fields();
 
 	/**
 	*	Return fields of mapper object as an associative array
@@ -88,6 +94,9 @@ abstract class Cursor extends \Magic {
 	**/
 	abstract function copyto($key);
 
+//	abstract function getiterator();
+
+
 	/**
 	*	Return TRUE if current cursor position is not mapped to any record
 	*	@return bool
@@ -116,9 +125,11 @@ abstract class Cursor extends \Magic {
 	*	@param $size int
 	*	@param $filter string|array
 	*	@param $options array
+	*	@param $ttl int
 	**/
-	function paginate($pos=0,$size=10,$filter=NULL,array $options=NULL) {
-		$total=$this->count($filter);
+	function paginate(
+		$pos=0,$size=10,$filter=NULL,array $options=NULL,$ttl=0) {
+		$total=$this->count($filter,$ttl);
 		$count=ceil($total/$size);
 		$pos=max(0,min($pos,$count-1));
 		return array(
@@ -126,7 +137,8 @@ abstract class Cursor extends \Magic {
 				array_merge(
 					$options?:array(),
 					array('limit'=>$size,'offset'=>$pos*$size)
-				)
+				),
+				$ttl
 			),
 			'total'=>$total,
 			'limit'=>$size,
@@ -145,6 +157,14 @@ abstract class Cursor extends \Magic {
 	function load($filter=NULL,array $options=NULL,$ttl=0) {
 		return ($this->query=$this->find($filter,$options,$ttl)) &&
 			$this->skip(0)?$this->query[$this->ptr=0]:FALSE;
+	}
+
+	/**
+	*	Return the count of records loaded
+	*	@return int
+	**/
+	function loaded() {
+		return count($this->query);
 	}
 
 	/**
@@ -191,6 +211,13 @@ abstract class Cursor extends \Magic {
 	}
 
 	/**
+	 * Return whether current iterator position is valid.
+	 */
+	function valid() {
+		return !$this->dry();
+	}
+
+	/**
 	*	Save mapped record
 	*	@return mixed
 	**/
@@ -210,34 +237,92 @@ abstract class Cursor extends \Magic {
 
 	/**
 	*	Define onload trigger
-	*	@return closure
+	*	@return callback
+	*	@param $func callback
 	**/
 	function onload($func) {
 		return $this->trigger['load']=$func;
 	}
 
 	/**
+	*	Define beforeinsert trigger
+	*	@return callback
+	*	@param $func callback
+	**/
+	function beforeinsert($func) {
+		return $this->trigger['beforeinsert']=$func;
+	}
+
+	/**
+	*	Define afterinsert trigger
+	*	@return callback
+	*	@param $func callback
+	**/
+	function afterinsert($func) {
+		return $this->trigger['afterinsert']=$func;
+	}
+
+	/**
 	*	Define oninsert trigger
-	*	@return closure
+	*	@return callback
+	*	@param $func callback
 	**/
 	function oninsert($func) {
-		return $this->trigger['insert']=$func;
+		return $this->afterinsert($func);
+	}
+
+	/**
+	*	Define beforeupdate trigger
+	*	@return callback
+	*	@param $func callback
+	**/
+	function beforeupdate($func) {
+		return $this->trigger['beforeupdate']=$func;
+	}
+
+	/**
+	*	Define afterupdate trigger
+	*	@return callback
+	*	@param $func callback
+	**/
+	function afterupdate($func) {
+		return $this->trigger['afterupdate']=$func;
 	}
 
 	/**
 	*	Define onupdate trigger
-	*	@return closure
+	*	@return callback
+	*	@param $func callback
 	**/
 	function onupdate($func) {
-		return $this->trigger['update']=$func;
+		return $this->afterupdate($func);
+	}
+
+	/**
+	*	Define beforeerase trigger
+	*	@return callback
+	*	@param $func callback
+	**/
+	function beforeerase($func) {
+		return $this->trigger['beforeerase']=$func;
+	}
+
+	/**
+	*	Define aftererase trigger
+	*	@return callback
+	*	@param $func callback
+	**/
+	function aftererase($func) {
+		return $this->trigger['aftererase']=$func;
 	}
 
 	/**
 	*	Define onerase trigger
-	*	@return closure
+	*	@return callback
+	*	@param $func callback
 	**/
 	function onerase($func) {
-		return $this->trigger['erase']=$func;
+		return $this->aftererase($func);
 	}
 
 	/**

@@ -18,6 +18,10 @@ namespace DB\SQL;
 //! SQL-managed session handler
 class Session extends Mapper {
 
+	protected
+		//! Session ID
+		$sid;
+
 	/**
 	*	Open session
 	*	@return TRUE
@@ -42,7 +46,8 @@ class Session extends Mapper {
 	*	@param $id string
 	**/
 	function read($id) {
-		$this->load(array('session_id=?',$id));
+		if ($id!=$this->sid)
+			$this->load(array('session_id=?',$this->sid=$id));
 		return $this->dry()?FALSE:$this->get('data');
 	}
 
@@ -56,7 +61,8 @@ class Session extends Mapper {
 		$fw=\Base::instance();
 		$sent=headers_sent();
 		$headers=$fw->get('HEADERS');
-		$this->load(array('session_id=?',$id));
+		if ($id!=$this->sid)
+			$this->load(array('session_id=?',$this->sid=$id));
 		$csrf=$fw->hash($fw->get('ROOT').$fw->get('BASE')).'.'.
 			$fw->hash(mt_rand());
 		$this->set('session_id',$id);
@@ -94,42 +100,34 @@ class Session extends Mapper {
 	}
 
 	/**
-	*	Return anti-CSRF tokan associated with specified session ID
+	*	Return anti-CSRF token
 	*	@return string|FALSE
-	*	@param $id string
 	**/
-	function csrf($id=NULL) {
-		$this->load(array('session_id=?',$id?:session_id()));
+	function csrf() {
 		return $this->dry()?FALSE:$this->get('csrf');
 	}
 
 	/**
-	*	Return IP address associated with specified session ID
+	*	Return IP address
 	*	@return string|FALSE
-	*	@param $id string
 	**/
-	function ip($id=NULL) {
-		$this->load(array('session_id=?',$id?:session_id()));
+	function ip() {
 		return $this->dry()?FALSE:$this->get('ip');
 	}
 
 	/**
-	*	Return Unix timestamp associated with specified session ID
+	*	Return Unix timestamp
 	*	@return string|FALSE
-	*	@param $id string
 	**/
-	function stamp($id=NULL) {
-		$this->load(array('session_id=?',$id?:session_id()));
+	function stamp() {
 		return $this->dry()?FALSE:$this->get('stamp');
 	}
 
 	/**
-	*	Return HTTP user agent associated with specified session ID
+	*	Return HTTP user agent
 	*	@return string|FALSE
-	*	@param $id string
 	**/
-	function agent($id=NULL) {
-		$this->load(array('session_id=?',$id?:session_id()));
+	function agent() {
 		return $this->dry()?FALSE:$this->get('agent');
 	}
 
@@ -137,25 +135,31 @@ class Session extends Mapper {
 	*	Instantiate class
 	*	@param $db object
 	*	@param $table string
+	*	@param $force bool
 	**/
-	function __construct(\DB\SQL $db,$table='sessions') {
-		$db->exec(
-			(preg_match('/mssql|sqlsrv|sybase/',$db->driver())?
-				('IF NOT EXISTS (SELECT * FROM sysobjects WHERE '.
-					'name='.$db->quote($table).' AND xtype=\'U\') '.
-					'CREATE TABLE dbo.'):
-				('CREATE TABLE IF NOT EXISTS '.
-					(($name=$db->name())?($name.'.'):''))).
-			$table.' ('.
-				'session_id VARCHAR(40),'.
-				'data TEXT,'.
-				'csrf TEXT,'.
-				'ip VARCHAR(40),'.
-				'agent VARCHAR(255),'.
-				'stamp INTEGER,'.
-				'PRIMARY KEY(session_id)'.
-			');'
-		);
+	function __construct(\DB\SQL $db,$table='sessions',$force=TRUE) {
+		if ($force) {
+			$eol="\n";
+			$tab="\t";
+			$db->exec(
+				(preg_match('/mssql|sqlsrv|sybase/',$db->driver())?
+					('IF NOT EXISTS (SELECT * FROM sysobjects WHERE '.
+						'name='.$db->quote($table).' AND xtype=\'U\') '.
+						'CREATE TABLE dbo.'):
+					('CREATE TABLE IF NOT EXISTS '.
+						((($name=$db->name())&&$db->driver()!='pgsql')?
+							($name.'.'):''))).
+				$table.' ('.$eol.
+					$tab.$db->quotekey('session_id').' VARCHAR(40),'.$eol.
+					$tab.$db->quotekey('data').' TEXT,'.$eol.
+					$tab.$db->quotekey('csrf').' TEXT,'.$eol.
+					$tab.$db->quotekey('ip').' VARCHAR(40),'.$eol.
+					$tab.$db->quotekey('agent').' VARCHAR(255),'.$eol.
+					$tab.$db->quotekey('stamp').' INTEGER,'.$eol.
+					$tab.'PRIMARY KEY ('.$db->quotekey('session_id').')'.$eol.
+				');'
+			);
+		}
 		parent::__construct($db,$table);
 		session_set_save_handler(
 			array($this,'open'),
@@ -178,7 +182,7 @@ class Session extends Mapper {
 		}
 		$csrf=$fw->hash($fw->get('ROOT').$fw->get('BASE')).'.'.
 			$fw->hash(mt_rand());
-		if ($this->load(array('session_id=?',session_id()))) {
+		if ($this->load(array('session_id=?',$this->sid=session_id()))) {
 			$this->set('csrf',$csrf);
 			$this->save();
 		}
