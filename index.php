@@ -2,8 +2,8 @@
 /** @var Base $f3 */
 $f3 = require('lib/base.php');
 
-ini_set('display_errors', 1);
-error_reporting(-1);
+//ini_set('display_errors', 1);
+//error_reporting(-1);
 
 //$f3->set('JAR.expire', time()+(60*60*2));
 
@@ -139,3 +139,4 @@ $f3->route('GET /logout', 'Controller\Auth->logout');
 
 // let's cross the finger
 $f3->run();
+//var_dump($f3->get('DB')->log());

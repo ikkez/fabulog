@@ -38,15 +38,12 @@ class Post extends Resource {
 				array('order'=>'publish_date desc'));
 		} else {
 			// frontend view
+
+			$tags = new Tag();
+			$f3->set('tag_cloud',$tags->tagCloud());
+
 			$this->resource->filter('comments', array('approved = ?',1));
 			$this->resource->countRel('comments');
-
-			$tags = new \Model\Tag();
-			$tags->filter('post',array('published = ? and publish_date <= ?',1,date('Y-m-d')));
-			$tags->countRel('post');
-			$allTags=$tags->find(null,array('order'=>'count_post desc'));
-			$f3->set('tag_cloud',$allTags);
-
 			$records = $this->resource->paginate($page-1,10,
 				array('publish_date <= ? and published = ?', date('Y-m-d'), 1),
 				array('order' => 'publish_date desc'));

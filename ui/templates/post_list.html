@@ -1,3 +1,10 @@
+<F3:check if="{{ isset(@headline) }}">
+	<h1>{{ @headline }}</h1>
+	<hr>
+</F3:check>
+
+<F3:check if="{{ @content }}">
+
 <F3:repeat group="{{ @content.subset }}" value="{{ @post }}">
 <div class="post-entry">
     <h2><a href="{{ @post.slug }}">{{@post.title | esc}}</a></h2>
@@ -24,3 +31,5 @@
 </F3:repeat>
 
 <F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{@content.limit}}" token-prefix="page-" link-path="/page/"/>
+
+</F3:check>
