@@ -80,13 +80,13 @@
                     <label>Publish state</label>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="published" id="published1" value="0" {{((isset(@content.published) && @content.published==0)?'checked':'')}}>
+                            <input type="radio" name="published" id="published1" value="false" {{((isset(@content.published) && @content.published==false)?'checked':'')}}>
                             Draft
                         </label>
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="published" id="published2" value="1" {{((isset(@content.published) && @content.published==1)?'checked':'')}}>
+                            <input type="radio" name="published" id="published2" value="true" {{((isset(@content.published) && @content.published==true)?'checked':'')}}>
                             Published
                         </label>
                     </div>
@@ -97,13 +97,13 @@
                     <label>Allow comments</label>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="enable_comments" value="0" {{((isset(@content.enable_comments) && @content.enable_comments==0)?'checked':'')}}>
+                            <input type="radio" name="enable_comments" value="false" {{((isset(@content.enable_comments) && @content.enable_comments==false)?'checked':'')}}>
                             No
                         </label>
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="enable_comments" value="1" {{((isset(@content.enable_comments) && @content.enable_comments==1)?'checked':'')}}>
+                            <input type="radio" name="enable_comments" value="true" {{((isset(@content.enable_comments) && @content.enable_comments==true)?'checked':'')}}>
                             Yes
                         </label>
                     </div>

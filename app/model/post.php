@@ -32,7 +32,7 @@ class Post extends Base {
 			),
 			'published' => array(
 				'type' => \DB\SQL\Schema::DT_BOOLEAN,
-				'default'=>0,
+				'default'=>false,
 			),
 			'author' => array(
 				'belongs-to-one' => '\Model\User',
@@ -45,7 +45,7 @@ class Post extends Base {
 			),
 			'enable_comments' => array(
 				'type' => \DB\SQL\Schema::DT_BOOLEAN,
-				'default'=>1,
+				'default'=>true,
 			),
 		),
 		$table = 'posts',

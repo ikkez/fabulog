@@ -31,7 +31,7 @@
                         </button>
                         <ul class="dropdown-menu" role="menu">
                             <li>
-                                <check if="{{ @item.published == 1 }}">
+                                <check if="{{ @item.published == true }}">
                                     <true>
                                         <a href="admin/post/hide/{{ @item._id }}"><i class="glyphicon glyphicon-eye-close"></i> hide</a>
                                     </true>
@@ -54,7 +54,7 @@
         </div>
         <div class="meta">
                 <span class="author pull-left"><i class="glyphicon glyphicon-user"></i> {{isset(@item.author)?@item.author.name:''}}</span>
-                <check if="{{ @item.published == 1 }}">
+                <check if="{{ @item.published == true }}">
                     <true>
                         <span style="background-color: lightgreen;">
                             <i class="glyphicon glyphicon-eye-open"></i> active</span>

@@ -21,13 +21,13 @@ class Tag extends Resource {
 			$f3->set('tag_cloud',$this->tagCloud());
 
 			$post = new \Model\Post();
-			$post->filter('comments',array('approved = 1'));
+			$post->filter('comments',array('approved = ?',1));
 			$post->has('tags',array('slug = ?',$params['slug']));
 			$post->countRel('comments');
 			$page = \Pagination::findCurrentPage();
 			$posts = $post->paginate($page - 1, 10,
-				array('publish_date <= ? and published = ?',
-					date('Y-m-d'),1),array('order'=>'publish_date desc'));
+				array('publish_date <= ? and published = ?', date('Y-m-d'), true),
+				array('order'=>'publish_date desc'));
 			$this->response->data = array(
 				'content' => $posts,
 				'headline' => 'All Post by Tag: '.$params['slug'],
@@ -55,7 +55,7 @@ class Tag extends Resource {
 
 	public function tagCloud() {
 		$tags = new \Model\Tag();
-		$tags->filter('post',array('published = ? and publish_date <= ?',1,date('Y-m-d')));
+		$tags->filter('post',array('published = ? and publish_date <= ?', true, date('Y-m-d')));
 		$tags->countRel('post');
 		return $tags->find(null,array('order'=>'count_post desc'));
 	}

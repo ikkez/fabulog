@@ -45,7 +45,7 @@ class Post extends Resource {
 			$this->resource->filter('comments', array('approved = ?',1));
 			$this->resource->countRel('comments');
 			$records = $this->resource->paginate($page-1,10,
-				array('publish_date <= ? and published = ?', date('Y-m-d'), 1),
+				array('publish_date <= ? and published = ?', date('Y-m-d'), true),
 				array('order' => 'publish_date desc'));
 		}
 		$this->response->data['content'] = $records;
@@ -82,11 +82,11 @@ class Post extends Resource {
 
 		// select a post by its ID
 		if (isset($params['id'])) {
-			$this->resource->load(array('_id = ?'.$addQuery, $params['id'], date('Y-m-d'), 1));
+			$this->resource->load(array('_id = ?'.$addQuery, $params['id'], date('Y-m-d'), true));
 		}
 		// select a post by its slugged title
 		elseif (isset($params['slug'])) {
-			$this->resource->load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d'), 1));
+			$this->resource->load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d'), true));
 		}
 		$this->response->data['content'] = $this->resource;
 
@@ -113,7 +113,7 @@ class Post extends Resource {
 		if (isset($params['slug'])) {
 			// you may only comment published posts
 			$this->resource->load(array('slug = ? and publish_date <= ? and published = ?',
-							  $params['slug'], date('Y-m-d'), 1));
+							  $params['slug'], date('Y-m-d'), true));
 			if ($this->resource->dry()) {
 				// invalid post ID
 				$f3->error(404, 'Post not found.');
@@ -145,7 +145,7 @@ class Post extends Resource {
 
 	public function publish($f3, $params)
 	{
-		if ($this->resource->updateProperty(array('_id = ?', $params['id']), 'published', 1)) {
+		if ($this->resource->updateProperty(array('_id = ?', $params['id']), 'published', true)) {
 			\FlashMessage::instance()->addMessage('Your post was published. Hurray!', 'success');
 		} else {
 			\FlashMessage::instance()->addMessage('This Post ID was not found', 'danger');
@@ -155,7 +155,7 @@ class Post extends Resource {
 
 	public function hide($f3, $params)
 	{
-		if ($this->resource->updateProperty(array('_id = ?', $params['id']), 'published', 0)) {
+		if ($this->resource->updateProperty(array('_id = ?', $params['id']), 'published', false)) {
 			\FlashMessage::instance()->addMessage('Your post is now hidden.', 'success');
 		} else {
 			\FlashMessage::instance()->addMessage('This Post ID was not found', 'danger');
