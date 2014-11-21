@@ -28,7 +28,7 @@ class Post extends Base {
 				'required' => true,
 			),
 			'publish_date' => array(
-				'type' => \DB\SQL\Schema::DT_TIMESTAMP
+				'type' => \DB\SQL\Schema::DT_DATE
 			),
 			'published' => array(
 				'type' => \DB\SQL\Schema::DT_BOOLEAN,
