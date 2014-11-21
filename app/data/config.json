@@ -21,6 +21,12 @@
             "host": "localhost",
             "dbname": "fatfree"
         },
+        "DB_SQLSRV": {
+            "user": "fatfree",
+            "password": "fatfree",
+            "host": "LOCALHOST\\SQLEXPRESS2012",
+            "dbname": "fatfree"
+        },
         "DB_MONGO": {
             "host": "localhost",
             "port": "27017",

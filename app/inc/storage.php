@@ -33,6 +33,11 @@ class storage extends Prefab {
 					';dbname='.$cfg->DB_PGSQL['dbname'],
 					$cfg->DB_PGSQL['user'], $cfg->DB_PGSQL['password']);
 				break;
+			case 'SQLSRV':
+				$db = new \DB\SQL('sqlsrv:SERVER='.$cfg->DB_SQLSRV['host'].
+					';Database='.$cfg->DB_SQLSRV['dbname'],
+					$cfg->DB_SQLSRV['user'], $cfg->DB_SQLSRV['password']);
+				break;
 			case 'SQLITE':
 				$db = new \DB\SQL('sqlite:'.$cfg->DB_SQLITE['path']);
 				break;
