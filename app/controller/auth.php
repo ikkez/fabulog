@@ -44,7 +44,7 @@ class Auth extends Base {
                     $valid = (md5($f3->get('POST.password').$f3->get('password_md5_salt')) == $user->password);
                 }
                 if($valid) {
-                    $f3->clear('SESSION'); //recreate session id
+                    @$f3->clear('SESSION'); //recreate session id
                     $f3->set('SESSION.user_id',$user->_id);
                     if($f3->get('CONFIG.ssl_backend'))
                         $f3->reroute('https://'.$f3->get('HOST').$f3->get('BASE').'/admin');
