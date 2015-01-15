@@ -34,6 +34,7 @@ class setup {
 		$user->load(array('username = ?', 'admin'));
 		if ($user->dry()) {
 			$user->username = 'admin';
+			$user->name = 'Administrator';
 			$user->password = 'fabulog';
 			$user->save();
 			\FlashMessage::instance()->addMessage('Admin User created,'
