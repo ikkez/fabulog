@@ -4,6 +4,9 @@
     </div>
     <p>
         <span class="meta date"><i class="glyphicon glyphicon-calendar"></i> {{date('d.m.Y',strtotime(@content.publish_date))}}</span>
+        <F3:check if="{{ @content.author }}">
+            <span class="meta"><i class="glyphicon glyphicon-user"></i> {{@content.author.name}}</span>
+        </F3:check>
         <F3:check if="{{ @content.tags }}">
         <span class="meta tags"><i class="glyphicon glyphicon-tag"></i>
             <F3:repeat group="{{ @content.tags }}" value="{{ @tag }}">
