@@ -1,4 +1,4 @@
-<F3:repeat group="{{ \FlashMessage::instance()->getMessages() }}" value="{{ @msg }}">
+<F3:repeat group="{{ \Flash::instance()->getMessages() }}" value="{{ @msg }}">
     <div class="alert alert-{{ @msg.status }} alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         {{ @msg.text | esc }}

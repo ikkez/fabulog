@@ -23,17 +23,13 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label>storage directory</label>
-                                                <input value="{{@CONFIG.DB_JIG.dir}}" type="text" name="JIG[dir]" class="form-control" placeholder="app/data/" />
+                                                <input type="text" name="DB_JIG[dir]" class="form-control" placeholder="app/data/" />
                                                 <span class="help-block">Notice: make sure this folder is writable</span>
                                             </div>
                                             <div class="form-group">
                                                 <label>format</label>
-                                                <select name="JIG[format]" class="form-control">
-                                                    <option value="0" {{@CONFIG.DB_JIG.format==0?'selected':''}}>JSON</option>
-                                                    <option value="1" {{@CONFIG.DB_JIG.format==1?'selected':''}}>Serialized</option>
-                                                </select>
+                                                <F3:select name="DB_JIG[format]" class="form-control" group="{{@JIG_format}}" />
                                                 <span class="help-block">Notice: switching the format of existing db files is not supported</span>
-
                                             </div>
                                         </div>
                                     </div>
@@ -60,13 +56,13 @@
                                         <div class="col-sm-8">
                                             <div class="form-group">
                                                 <label>database file path</label>
-                                                <input value="{{@CONFIG.DB_SQLITE.path}}" type="text" name="SQLITE[path]" class="form-control" placeholder="app/data/fblog_sqlite.db" />
+                                                <input type="text" name="DB_SQLITE[path]" class="form-control" placeholder="app/data/fblog_sqlite.db" />
                                                 <span class="help-block">Notice: this file will be created, if it's not existing. Make sure its folder is writable.</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <check if="{{extension_loaded('pdo_sqlite')}}">
+                                    <F3:check if="{{extension_loaded('pdo_sqlite')}}">
                                         <true>
                                             <input type="hidden" name="active_db" value="SQLITE" />
                                             <input type="submit" class="btn btn-primary" value="{{@CONFIG.ACTIVE_DB=='SQLITE'?'save':'switch to SQLite'}}" />
@@ -76,7 +72,7 @@
                                                 <strong>Missing dependency:</strong> "pdo_sqlite" module not loaded
                                             </div>
                                         </false>
-                                    </check>
+                                    </F3:check>
                                 </form>
                             </div>
                         </div>
@@ -97,31 +93,31 @@
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>username</label>
-                                            <input value="{{@CONFIG.DB_MYSQL.user}}" type="text" name="MYSQL[user]" autocomplete="off" class="form-control" placeholder="root" />
+                                            <input type="text" name="DB_MYSQL[user]" autocomplete="off" class="form-control" placeholder="root" />
                                         </div>
                                         <div class="col-xs-3 form-group">
                                             <label>password</label>
-                                            <input value="{{@CONFIG.DB_MYSQL.password}}" type="password" name="MYSQL[password]" autocomplete="off" class="form-control" />
+                                            <input type="text" name="DB_MYSQL[password]" autocomplete="off" class="form-control" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>host</label>
-                                            <input value="{{@CONFIG.DB_MYSQL.host}}" type="text" name="MYSQL[host]" class="form-control" placeholder="localhost" />
+                                            <input type="text" name="DB_MYSQL[host]" class="form-control" placeholder="localhost" />
                                         </div>
                                         <div class="col-xs-3 form-group">
                                             <label>port</label>
-                                            <input value="{{@CONFIG.DB_MYSQL.port}}" type="text" name="MYSQL[port]" class="form-control" placeholder="3306" />
+                                            <input type="text" name="DB_MYSQL[port]" class="form-control" placeholder="3306" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>database</label>
-                                            <input value="{{@CONFIG.DB_MYSQL.dbname}}" type="text" name="MYSQL[dbname]" class="form-control" placeholder="dbname" />
+                                            <input type="text" name="DB_MYSQL[dbname]" class="form-control" placeholder="dbname" />
                                         </div>
                                     </div>
 
-                                    <check if="{{extension_loaded('pdo_mysql')}}">
+                                    <F3:check if="{{extension_loaded('pdo_mysql')}}">
                                         <true>
                                             <input type="hidden" name="active_db" value="MYSQL" />
                                             <input type="submit" class="btn btn-primary" value="{{@CONFIG.ACTIVE_DB=='MYSQL'?'save':'switch to MySQL'}}" />
@@ -131,7 +127,7 @@
                                                 <strong>Missing dependency:</strong> "pdo_mysql" module not loaded
                                             </div>
                                         </false>
-                                    </check>
+                                    </F3:check>
                                 </form>
                             </div>
                         </div>
@@ -152,26 +148,26 @@
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>username</label>
-                                            <input value="{{@CONFIG.DB_PGSQL.user}}" type="text" name="PGSQL[user]" autocomplete="off" class="form-control" placeholder="root" />
+                                            <input type="text" name="DB_PGSQL[user]" autocomplete="off" class="form-control" placeholder="root" />
                                         </div>
                                         <div class="col-xs-3 form-group">
                                             <label>password</label>
-                                            <input value="{{@CONFIG.DB_PGSQL.password}}" type="password" autocomplete="off" name="PGSQL[password]" class="form-control" />
+                                            <input type="text" autocomplete="off" name="DB_PGSQL[password]" class="form-control" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>host</label>
-                                            <input value="{{@CONFIG.DB_PGSQL.host}}" type="text" name="PGSQL[host]" class="form-control" placeholder="localhost" />
+                                            <input type="text" name="DB_PGSQL[host]" class="form-control" placeholder="localhost" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>database</label>
-                                            <input value="{{@CONFIG.DB_PGSQL.dbname}}" type="text" name="PGSQL[dbname]" class="form-control" placeholder="dbname" />
+                                            <input type="text" name="DB_PGSQL[dbname]" class="form-control" placeholder="dbname" />
                                         </div>
                                     </div>
-                                    <check if="{{extension_loaded('pdo_pgsql')}}">
+                                    <F3:check if="{{extension_loaded('pdo_pgsql')}}">
                                         <true>
                                             <input type="hidden" name="active_db" value="PGSQL" />
                                             <input type="submit" class="btn btn-primary" value="{{@CONFIG.ACTIVE_DB=='PGSQL'?'save':'switch to PostgreSQL'}}" />
@@ -181,7 +177,7 @@
                                                 <strong>Missing dependency:</strong> "pdo_pgsql" module not loaded
                                             </div>
                                         </false>
-                                    </check>
+                                    </F3:check>
                                 </form>
                             </div>
                         </div>
@@ -202,26 +198,26 @@
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>username</label>
-                                            <input value="{{@CONFIG.DB_SQLSRV.user}}" type="text" name="SQLSRV[user]" autocomplete="off" class="form-control" placeholder="root" />
+                                            <input type="text" name="DB_SQLSRV[user]" autocomplete="off" class="form-control" placeholder="root" />
                                         </div>
                                         <div class="col-xs-3 form-group">
                                             <label>password</label>
-                                            <input value="{{@CONFIG.DB_SQLSRV.password}}" type="password" autocomplete="off" name="SQLSRV[password]" class="form-control" />
+                                            <input type="text" autocomplete="off" name="DB_SQLSRV[password]" class="form-control" />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-xs-3 form-group">
+                                        <div class="col-xs-6 form-group">
                                             <label>host</label>
-                                            <input value="{{@CONFIG.DB_SQLSRV.host}}" type="text" name="SQLSRV[host]" class="form-control" placeholder="LOCALHOST\INSTANCE" />
+                                            <input type="text" name="DB_SQLSRV[host]" class="form-control" placeholder="LOCALHOST\INSTANCE" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>database</label>
-                                            <input value="{{@CONFIG.DB_SQLSRV.dbname}}" type="text" name="SQLSRV[dbname]" class="form-control" placeholder="dbname" />
+                                            <input type="text" name="DB_SQLSRV[dbname]" class="form-control" placeholder="dbname" />
                                         </div>
                                     </div>
-                                    <check if="{{extension_loaded('pdo_sqlsrv')}}">
+                                    <F3:check if="{{extension_loaded('pdo_sqlsrv')}}">
                                         <true>
                                             <input type="hidden" name="active_db" value="SQLSRV" />
                                             <input type="submit" class="btn btn-primary" value="{{@CONFIG.ACTIVE_DB=='SQLSRV'?'save':'switch to SQL Server'}}" />
@@ -231,7 +227,7 @@
                                                 <strong>Missing dependency:</strong> "pdo_sqlsrv" module not loaded
                                             </div>
                                         </false>
-                                    </check>
+                                    </F3:check>
                                 </form>
                             </div>
                         </div>
@@ -253,21 +249,21 @@
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>host</label>
-                                            <input value="{{@CONFIG.DB_MONGO.host}}" type="text" name="MONGO[host]" class="form-control" placeholder="localhost" />
+                                            <input type="text" name="DB_MONGO[host]" class="form-control" placeholder="localhost" />
                                         </div>
                                         <div class="col-xs-3 form-group">
                                             <label>port</label>
-                                            <input value="{{@CONFIG.DB_MONGO.port}}" type="text" name="MONGO[port]" class="form-control" placeholder="27017" />
+                                            <input type="text" name="DB_MONGO[port]" class="form-control" placeholder="27017" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-xs-3 form-group">
                                             <label>database</label>
-                                            <input value="{{@CONFIG.DB_MONGO.dbname}}" type="text" name="MONGO[dbname]" class="form-control" placeholder="dbname" />
+                                            <input type="text" name="DB_MONGO[dbname]" class="form-control" placeholder="dbname" />
                                         </div>
                                     </div>
 
-                                    <check if="{{extension_loaded('mongo')}}">
+                                    <F3:check if="{{extension_loaded('mongo')}}">
                                         <true>
                                             <input type="hidden" name="active_db" value="MONGO" />
                                             <input type="submit" class="btn btn-primary" value="{{@CONFIG.ACTIVE_DB=='MONGO'?'save':'switch to MongoDB'}}" />
@@ -277,7 +273,7 @@
                                                 <strong>Missing dependency:</strong> "mongo" module not loaded
                                             </div>
                                         </false>
-                                    </check>
+                                    </F3:check>
 
                                 </form>
                             </div>

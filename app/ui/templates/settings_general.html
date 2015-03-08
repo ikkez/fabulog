@@ -6,14 +6,14 @@
 
                 <div class="form-group">
                     <label>Blog Title</label>
-                    <input value="{{(isset(@CONFIG.blog_title)?@CONFIG.blog_title:'')}}" type="text" name="title" class="form-control" placeholder="The title of your blog" />
+                    <input type="text" name="blog_title" class="form-control" placeholder="The title of your blog" />
                 </div>
 
                 <div class="form-group">
                         <label>SSL Backend</label>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="ssl_backend" value="1" {{((isset(@CONFIG->ssl_backend) && @CONFIG->ssl_backend==1)?'checked':'')}}>
+                                <input type="checkbox" name="ssl_backend" value="1" />
                                 switch to SSL connection on backend login
                             </label>
                         </div>
@@ -23,7 +23,7 @@
                         <label>auto approve comments</label>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" name="auto_approve_comments" value="1" {{((isset(@CONFIG->auto_approve_comments) && @CONFIG->auto_approve_comments==1)?'checked':'')}}>
+                                <input type="checkbox" name="auto_approve_comments" value="1" />
                                 if checked, comments immediately appears after posting
                                 otherwise you need to approve them first manually
                             </label>

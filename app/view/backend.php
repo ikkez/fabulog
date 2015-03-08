@@ -10,6 +10,8 @@ class Backend extends Base {
 	public function __construct() {
 		/** @var \Base $f3 */
 		$f3 = \Base::instance();
+		// change UI path to backend layout dir
+		$f3->copy('BACKEND_UI','UI');
 		// save last visited URL
 		if ($f3->exists('SESSION.CurrentPageURL')) {
 			if ($f3->get('SESSION.CurrentPageURL') != $f3->get('PARAMS.0'))
@@ -24,20 +26,11 @@ class Backend extends Base {
 	}
 
 	public function render() {
-		/** @var \Base $f3 */
-		$f3 = \Base::instance();
-		if ($f3->get('AJAX')) {
-			// if this is an ajax request, respond a JSON string
-			echo json_encode($this->data);
-		} else {
-			// add template data to F3 hive
-			if($this->data)
-				$f3->mset($this->data);
-			// change UI path to backend layout dir
-			$f3->copy('BACKEND_UI','UI');
-			// render base layout, the rest happens in template
-			echo \Template::instance()->render($this->template);
-		}
+		// add template data to F3 hive
+		if($this->data)
+			\Base::instance()->mset($this->data);
+		// render base layout, the rest happens in template
+		return \Template::instance()->render($this->template);
 	}
 
 }

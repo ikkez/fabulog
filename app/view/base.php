@@ -2,12 +2,12 @@
 
 namespace View;
 
-abstract class Base extends \Prefab {
+abstract class Base {
 
     public $data = array();
 
     /**
-     * create response content
+     * create and return response content
      * @return mixed
      */
     abstract public function render();

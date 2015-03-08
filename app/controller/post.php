@@ -7,11 +7,10 @@
     compliance with the license. Any of the license terms and conditions
     can be waived if you get permission from the copyright holder.
     
-    Copyright (c) 2013 ~ ikkez
+    Copyright (c) 2015 ~ ikkez
     Christian Knuth <ikkez0n3@gmail.com>
  
-        @version 0.1.0
-        @date: 03.02.14 
+        @version 0.2.0
  **/
 
 namespace Controller;
@@ -19,26 +18,31 @@ namespace Controller;
 
 class Post extends Resource {
 
-	public function __construct()
-	{
-		$mapper = new \Model\Post();
-		parent::__construct($mapper);
+	public function __construct() {
+		parent::__construct(new \Model\Post());
+		// setup delete cascade
+		$this->resource->onerase(function($self){
+			// erase comment references
+			$comments = new \Model\Comment();
+			$comments->erase(array('post = ?',$self->_id));
+			return true;
+		});
 	}
 
 	/**
 	 * display a list of post entries
+	 * @param \Base $f3
+	 * @param array $params
 	 */
-	public function getList($f3, $params)
-	{
+	public function getList(\Base $f3, $params) {
 		$this->response->data['SUBPART'] = 'post_list.html';
 		$page = \Pagination::findCurrentPage();
 		if ($this->response instanceof \View\Backend) {
 			// backend view
-			$records = $this->resource->paginate($page-1,25,null,
+			$records = $this->resource->paginate($page-1,5,null,
 				array('order'=>'publish_date desc'));
 		} else {
 			// frontend view
-
 			$tags = new Tag();
 			$f3->set('tag_cloud',$tags->tagCloud());
 
@@ -52,29 +56,31 @@ class Post extends Resource {
 	}
 
 	/**
-	 * display a single post
+	 * display a list of post entries by a specific tag they are attached to
+	 * @param \Base $f3
+	 * @param $params
 	 */
-	public function getSingle($f3, $params)
-	{
-		$this->response->data = array('SUBPART' => 'post_single.html');
-		$addQuery = '';
-		// only show published posts, except in backend
-		if (!$this->response instanceof \View\Backend)
-			$addQuery = ' and publish_date <= ? and published = ?';
-		else {
-			$ui = $f3->get('BACKEND_UI');
-			if ($f3->get('text_editor') == 'sommernote') {
-				$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.js');
-				$f3->set('ASSETS.CSS.fontawesome',
-					'//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css');
-				$f3->set('ASSETS.CSS.summernote', $ui.'css/summernote.css');
-				$f3->set('ASSETS.CSS.summernote-bs3', $ui.'css/summernote-bs3.css');
-			}
+	public function getListByTag(\Base $f3, $params) {
+		$this->response->data['headline'] = 'All Post by Tag: '.$params['slug'];
+		// set the tag condition
+		$this->resource->has('tags',array('slug = ?',$params['slug']));
+		$this->getList($f3,$params);
+	}
 
-			$f3->set('ASSETS.JS.jqueryui', $ui.'js/vendor/jquery.ui.widget.js');
-			$f3->set('ASSETS.JS.jq-iframe-transport', $ui.'js/jquery.iframe-transport.js');
-			$f3->set('ASSETS.JS.fileupload', $ui.'js/jquery.fileupload.js');
-			$f3->set('ASSETS.CSS.fileupload', $ui.'css/jquery.fileupload.css');
+	/**
+	 * display a single post
+	 * @param \Base $f3
+	 * @param array $params
+	 */
+	public function getSingle(\Base $f3, $params) {
+		$this->response->data['SUBPART'] = 'post_single.html';
+		$addQuery = '';
+
+		if ($this->response instanceof \View\Backend)
+			$this->initBackend();
+		else {
+			// only show published posts on the frontend
+			$addQuery = ' and publish_date <= ? and published = ?';
 		}
 
 		// show only approved comments in the next query
@@ -88,28 +94,67 @@ class Post extends Resource {
 		elseif (isset($params['slug'])) {
 			$this->resource->load(array('slug = ?'.$addQuery, $params['slug'], date('Y-m-d'), true));
 		}
-		$this->response->data['content'] = $this->resource;
 
-		if ($this->resource->dry() && !$this->response instanceof \View\Backend)
-			$f3->error(404, 'Post not found');
+		if ($this->response instanceof \View\Backend) {
+			$data=$this->resource->cast(null, 0);
+			if (!$this->resource->dry()) {
+				$tags=$this->resource->tags;
+				if ($tags)
+					$tags=implode(',', $tags->getAll('title'));
+				$data['tags']=$tags;
+			}
+			$data['publish_date'] = $f3->format('{0,date}', !empty($data['publish_date'])
+				? strtotime($data['publish_date']) : time());
+			// the model object itself, for getting relations etc.
+			$this->response->data['post']=$this->resource;
+			// the prepared form data, processed by FooForms
+			$this->response->data['POST']=$data;
+
+		} else {
+			if ($this->resource->dry())
+				$f3->error(404, 'Post not found');
+			// copy whole post model, to be able to fetch relations
+			// on the fly from within the template, if we need them
+			$this->response->data['post']=$this->resource;
+		}
 	}
 
+
+	public function initBackend() {
+		$f3 = \Base::instance();
+		$this->response->data['SUBPART'] = 'post_edit.html';
+
+		$ui = $f3->get('UI');
+		if ($f3->get('text_editor') == 'sommernote') {
+			$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.js');
+			$f3->set('ASSETS.CSS.fontawesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css');
+			$f3->set('ASSETS.CSS.summernote', $ui.'css/summernote.css');
+			$f3->set('ASSETS.CSS.summernote-bs3', $ui.'css/summernote-bs3.css');
+		}
+
+		$f3->set('ASSETS.JS.jqueryui', $ui.'js/vendor/jquery.ui.widget.js');
+		$f3->set('ASSETS.JS.jq-iframe-transport', $ui.'js/jquery.iframe-transport.js');
+		$f3->set('ASSETS.JS.fileupload', $ui.'js/jquery.fileupload.js');
+		$f3->set('ASSETS.CSS.fileupload', $ui.'css/jquery.fileupload.css');
+
+		$f3->set('DP_FORMAT', $f3->get('LANGUAGE') == 'de-DE' ? 'dd.mm.yyyy' : 'mm/dd/yy');
+	}
 
 	/**
-	 * remove a post entry
+	 * update/create post
+	 * @param \Base $f3
+	 * @param array $params
 	 */
-	public function delete($f3, $params)
-	{
-		// TODO: erase comments and tag references
-		parent::delete($f3,$params);
+	public function post(\Base $f3,$params) {
+		parent::post($f3,$params);
+		if ($this->response instanceof \View\Backend)
+			$this->initBackend();
 	}
-
 
 	/**
 	 * add a comment from POST data to current blog post
 	 */
-	public function addComment(\Base $f3, $params)
-	{
+	public function addComment(\Base $f3, $params) {
 		if (isset($params['slug'])) {
 			// you may only comment published posts
 			$this->resource->load(array('slug = ? and publish_date <= ? and published = ?',
@@ -124,47 +169,49 @@ class Post extends Resource {
 				return false;
 			}
 			$comment = new \Model\Comment();
-			if ($comment->addToPost($this->resource->_id)) {
-				// if posting was successful, reroute to the post view
-				if (\Config::instance()->get('auto_approve_comments'))
-					\FlashMessage::instance()->addMessage('Your comment has been added.',
-						'success');
-				else
-					\FlashMessage::instance()->addMessage('Your comment has been added, but must be approved first before it becomes public.',
-						'success');
-				$f3->reroute('/'.$params['slug']);
-			} else
+			$comment->copyfrom('POST','author_name, author_email, message');
+			$comment->post = $this->resource->_id;
+			$comment->approved = \Config::instance()->get('auto_approve_comments') ? 1 : 0;
+			$comment->save();
+
+			if ($f3->get('ERROR')) {
 				// if posting failed, return to comment form
 				$this->getSingle($f3, $params);
+			} else {
+				// if posting was successful, reroute to the post view
+				if (\Config::instance()->get('auto_approve_comments'))
+					\Flash::instance()->addMessage('Your comment has been added.', 'success');
+				else
+					\Flash::instance()->addMessage('Your comment has been added, but must be approved first before it becomes public.', 'success');
+				$f3->reroute('/'.$params['slug']);
+			}
 		} else {
 			// invalid URL, no post id given
-			\FlashMessage::instance()->addMessage('No Post ID specified.', 'danger');
+			\Flash::instance()->addMessage('No Post ID specified.', 'danger');
 			$f3->reroute('/');
 		}
 	}
 
-	public function publish($f3, $params)
-	{
+
+	public function publish($f3, $params) {
 		if ($this->resource->updateProperty(array('_id = ?', $params['id']), 'published', true)) {
-			\FlashMessage::instance()->addMessage('Your post was published. Hurray!', 'success');
+			\Flash::instance()->addMessage('Your post was published. Hurray!', 'success');
 		} else {
-			\FlashMessage::instance()->addMessage('This Post ID was not found', 'danger');
+			\Flash::instance()->addMessage('This Post ID was not found', 'danger');
 		}
 		$f3->reroute('/admin/post');
 	}
 
-	public function hide($f3, $params)
-	{
+	public function hide($f3, $params) {
 		if ($this->resource->updateProperty(array('_id = ?', $params['id']), 'published', false)) {
-			\FlashMessage::instance()->addMessage('Your post is now hidden.', 'success');
+			\Flash::instance()->addMessage('Your post is now hidden.', 'success');
 		} else {
-			\FlashMessage::instance()->addMessage('This Post ID was not found', 'danger');
+			\Flash::instance()->addMessage('This Post ID was not found', 'danger');
 		}
 		$f3->reroute('/admin/post');
 	}
 
-	public function beforeroute()
-	{
-		$this->response = \View\Frontend::instance();
+	public function beforeroute() {
+		$this->response = new \View\Frontend();
 	}
 } 

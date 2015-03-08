@@ -51,26 +51,12 @@
 
 
     <div class="container" id="main">
-        <div class="row">
-            <div class="col-md-8">
-                <include if="{{isset(@SUBPART)}}" href="{{'templates/'.@SUBPART}}"/>
-            </div>
-            <div class="col-md-4">
-                <h4>active Tags with count</h4>
-                <div>
-                    <F3:repeat group="{{ @@tag_cloud }}" value="{{ @tag }}">
-                        <F3:check if="{{ @tag.count_post }}">
-                            <a class="badge" href="tag/{{@tag.slug}}">{{ @tag.title }} {{ @tag.count_post > 1 ? '['.@tag.count_post.']' :'' }}</a>
-                        </F3:check>
-                    </F3:repeat>
-                </div>
-                {*<h4>Search</h4>
-                <h4>Last Posts</h4>
-                <h4>Last Comments</h4>
-                <h4>Meta Pages</h4>*}
-            </div>
-        </div>
-        <p class="stats">{{ \Base::instance()->format('Page rendered in {0} msecs / Memory usage {1} KB',round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</p>
+
+        <include if="{{@ERROR && @ERROR.code != 400}}" href="templates/error.html"/>
+
+        <include if="{{isset(@SUBPART)}}" href="{{'templates/'.@SUBPART}}"/>
+
+        <p class="stats">{{ \Base::instance()->format('Page rendered by fabulog v{0}, using {1} in {2} msecs / Memory usage {3} KB',@APP_VERSION,@CONFIG->ACTIVE_DB,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</p>
     </div>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>

@@ -1,6 +1,7 @@
 <?php
 /** @var Base $f3 */
 $f3 = require('lib/base.php');
+$f3->set('APP_VERSION', '0.2.0');
 
 //ini_set('display_errors', 1);
 //error_reporting(-1);
@@ -33,10 +34,12 @@ else {
 }
 
 $f3->set('CONFIG', $cfg);
-$f3->set('FLASH', FlashMessage::instance());
+$f3->set('FLASH', Flash::instance());
 
-\Template::instance()->extend('image','\ImageViewHelper::render');
+\Template::instance()->extend('image','\Template\Tags\Image::render');
 \Template::instance()->extend('pagebrowser','\Pagination::renderTag');
+// Handles all <form> data
+\Template\FooForms::init();
 
 ## POSTS
 // view list
@@ -55,8 +58,9 @@ $f3->route('POST /@slug', 'Controller\Post->addComment');
 ## TAGS
 $f3->route(array(
     'GET /tag [ajax]',
-    'GET /tag/@slug'
    ),'Controller\Tag->getList');
+
+$f3->route('GET /tag/@slug','Controller\Post->getListByTag');
 
 
 ///////////////
@@ -65,43 +69,25 @@ $f3->route(array(
 
 if (\Controller\Auth::isLoggedIn()) {
 
-    # specific routes
+    // specific routes
     // comments
     $f3->route(array(
         'GET /admin/comment/list/@viewtype',
         'GET /admin/comment/list/@viewtype/@page',
     ), 'Controller\Comment->getList');
-    $f3->route('GET /admin/comment/approve/@id', 'Controller\Comment->approve');
-    $f3->route('GET /admin/comment/reject/@id', 'Controller\Comment->reject');
-    // posts
-    $f3->route('GET /admin/post/publish/@id', 'Controller\Post->publish');
-    $f3->route('GET /admin/post/hide/@id', 'Controller\Post->hide');
 
-    # general CRUD operations
-    // create record
-    $f3->route('POST /admin/@module', 'Controller\@module->post');
-    // update record
-    $f3->route('POST /admin/@module/save/@id', 'Controller\@module->post');
-    // delete record
-    $f3->route('GET /admin/@module/delete/@id', 'Controller\@module->delete');
-
-    # general forms
-    // view list
-    $f3->route(array(
-        'GET /admin/@module',
-        'GET /admin/@module/@page')
-        , 'Controller\Backend->getList');
-    // view create form
+    // general CRUD operations
+    $f3->route('GET|POST /admin/@module', 'Controller\Backend->getList');
+    $f3->route('GET|POST /admin/@module/@page', 'Controller\Backend->getList');
+//    $f3->route('GET|POST /admin/@module/@action', 'Controller\Backend->@action');
+    $f3->route('GET|POST /admin/@module/@action/@id', 'Controller\Backend->@action');
+    // some method reroutes
     $f3->route('GET /admin/@module/create', 'Controller\Backend->getSingle');
-    // view edit form
+    $f3->route('POST /admin/@module/create', 'Controller\Backend->post');
     $f3->route('GET /admin/@module/edit/@id', 'Controller\Backend->getSingle');
+    $f3->route('POST /admin/@module/edit/@id', 'Controller\Backend->post');
 
-
-//	$f3->route('GET /admin/@module', 'Controller\@module->getSingle');
-//	$f3->route('GET /admin/@module/@action', 'Controller\@module->@action');
-//	$f3->route('GET /admin/@module/@action/@id', 'Controller\@module->@action');
-
-    // dashboard
+    // backend home - dashboard
     $f3->route('GET /admin', 'Controller\Dashboard->main');
 
     // settings panel
@@ -109,9 +95,7 @@ if (\Controller\Auth::isLoggedIn()) {
     $f3->route('GET|POST /admin/settings/@type', 'Controller\Settings->@type');
 
     // no auth again
-    $f3->route('GET|POST /login', function (Base $f3) {
-        $f3->reroute('/admin');
-    });
+    $f3->redirect('GET|POST /login', '/admin', false);
 
     // upload file
     $f3->route('POST /admin/file [ajax]', function ($f3) {
@@ -127,10 +111,7 @@ if (\Controller\Auth::isLoggedIn()) {
 
 } else {
     // login
-    $f3->route(array('GET|POST /admin/*','GET|POST /admin'),function(Base $f3) {
-        $f3->reroute('/login');
-    });
-
+    $f3->redirect(array('GET|POST /admin/*','GET|POST /admin'), '/login', false);
     $f3->route('GET|POST /login','Controller\Auth->login');
 }
 

@@ -1,14 +1,14 @@
 <h2>Comment list</h2>
 
-<F3:check if="{{ !@content || @content.total == 0 }}">
+<F3:check if="{{ !@comments || @comments.total == 0 }}">
     <div class="solid">
     <div class="alert alert-info">You have no comments in this list.</div>
     </div>
 </F3:check>
 
-<F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{ @content.limit }}" token-prefix="page-" />
+<F3:pagebrowser items="{{@comments.total}}" src="templates/pagebrowser.html" limit="{{ @comments.limit }}" token-prefix="page-" />
 
-<F3:repeat group="{{ @content.subset }}" value="{{ @item }}">
+<F3:repeat group="{{ @comments.subset }}" value="{{ @item }}">
     <div class="row solid">
         <div class="col-md-8">
             <dl class="dl-horizontal w120 comment-element">
@@ -19,7 +19,7 @@
                 <dt><i class="glyphicon glyphicon-envelope"></i> E-Mail</dt>
                 <dd>{{@item.author_email | esc}}</dd>
                 <dt><i class="glyphicon glyphicon-calendar"></i> Date</dt>
-                <dd>{{date('d.m.Y, H:i',strtotime(@item.datetime))}}</dd>
+                <dd>{{'{0,date}, {1,time}', strtotime(@item.datetime), strtotime(@item.datetime) | format}}</dd>
                 <dt><i class="glyphicon glyphicon-comment"></i> Message</dt>
                 <dd>{{@item.message | esc }}</dd>
                 <dt><i class="glyphicon glyphicon-comment"></i> Publish state:</dt>

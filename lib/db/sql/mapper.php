@@ -55,12 +55,34 @@ class Mapper extends \DB\Cursor {
 	}
 
 	/**
+	*	Return mapped table
+	*	@return string
+	**/
+	function table() {
+		return $this->source;
+	}
+
+	/**
 	*	Return TRUE if field is defined
 	*	@return bool
 	*	@param $key string
 	**/
 	function exists($key) {
 		return array_key_exists($key,$this->fields+$this->adhoc);
+	}
+
+	/**
+	*	Return TRUE if any/specified field value has changed
+	*	@return bool
+	*	@param $key string
+	**/
+	function changed($key=NULL) {
+		if (isset($key))
+			return $this->fields[$key]['changed'];
+		foreach($this->fields as $key=>$field)
+			if ($field['changed'])
+				return TRUE;
+		return FALSE;
 	}
 
 	/**
@@ -95,7 +117,7 @@ class Mapper extends \DB\Cursor {
 			return $this->fields[$key]['value'];
 		elseif (array_key_exists($key,$this->adhoc))
 			return $this->adhoc[$key]['value'];
-		user_error(sprintf(self::E_Field,$key));
+		user_error(sprintf(self::E_Field,$key),E_USER_ERROR);
 	}
 
 	/**
@@ -197,15 +219,19 @@ class Mapper extends \DB\Cursor {
 			}
 			$sql.=' WHERE '.$filter;
 		}
-		if ($options['group'])
+		if ($options['group']) {
 			$sql.=' GROUP BY '.implode(',',array_map(
 				function($str) use($db) {
-					return preg_match('/^(\w+)(?:\h+HAVING|\h*(?:,|$))/i',
-						$str,$parts)?
-						($db->quotekey($parts[1]).
-						(isset($parts[2])?(' '.$parts[2]):'')):$str;
+					return preg_replace_callback(
+						'/\b(\w+)\h*(HAVING.+|$)/i',
+						function($parts) use($db) {
+							return $db->quotekey($parts[1]);
+						},
+						$str
+					);
 				},
 				explode(',',$options['group'])));
+		}
 		if ($options['order']) {
 			$sql.=' ORDER BY '.implode(',',array_map(
 				function($str) use($db) {
@@ -348,7 +374,8 @@ class Mapper extends \DB\Cursor {
 	**/
 	function insert() {
 		$args=array();
-		$ctr=0;
+		$actr=0;
+		$nctr=0;
 		$fields='';
 		$values='';
 		$filter='';
@@ -369,13 +396,14 @@ class Mapper extends \DB\Cursor {
 					empty($field['value']) && !$field['nullable'])
 					$inc=$key;
 				$filter.=($filter?' AND ':'').$this->db->quotekey($key).'=?';
-				$nkeys[$ctr+1]=array($field['value'],$field['pdo_type']);
+				$nkeys[$nctr+1]=array($field['value'],$field['pdo_type']);
+				$nctr++;
 			}
 			if ($field['changed'] && $key!=$inc) {
-				$fields.=($ctr?',':'').$this->db->quotekey($key);
-				$values.=($ctr?',':'').'?';
-				$args[$ctr+1]=array($field['value'],$field['pdo_type']);
-				$ctr++;
+				$fields.=($actr?',':'').$this->db->quotekey($key);
+				$values.=($actr?',':'').'?';
+				$args[$actr+1]=array($field['value'],$field['pdo_type']);
+				$actr++;
 				$ckeys[]=$key;
 			}
 			$field['changed']=FALSE;
@@ -521,11 +549,12 @@ class Mapper extends \DB\Cursor {
 	/**
 	*	Hydrate mapper object using hive array variable
 	*	@return NULL
-	*	@param $key string
+	*	@param $var array|string
 	*	@param $func callback
 	**/
-	function copyfrom($key,$func=NULL) {
-		$var=\Base::instance()->get($key);
+	function copyfrom($var,$func=NULL) {
+		if (is_string($var))
+			$var=\Base::instance()->get($var);
 		if ($func)
 			$var=call_user_func($func,$var);
 		foreach ($var as $key=>$val)

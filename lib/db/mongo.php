@@ -81,7 +81,7 @@ class Mongo {
 	**/
 	function drop() {
 		$out=$this->db->drop();
-		$this->setprofilinglevel(-1);
+		$this->setprofilinglevel(2);
 		return $out;
 	}
 
@@ -105,7 +105,7 @@ class Mongo {
 		$this->uuid=\Base::instance()->hash($this->dsn=$dsn);
 		$class=class_exists('\MongoClient')?'\MongoClient':'\Mongo';
 		$this->db=new \MongoDB(new $class($dsn,$options?:array()),$dbname);
-		$this->setprofilinglevel(-1);
+		$this->setprofilinglevel(2);
 	}
 
 }

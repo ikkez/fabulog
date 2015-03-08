@@ -7,12 +7,12 @@
         <true>
             <check if="{{ @lastDate != @item.publish_date }}">
                 <set lastDate="{{@item.publish_date}}"/>
-                <h4>{{date('d.m.Y',strtotime(@lastDate))}}</h4>
+                <h4>{{'{0,date}', strtotime(@lastDate) | format }}</h4>
             </check>
         </true>
         <false>
             <set lastDate="{{@item.publish_date}}" />
-            <h4>{{date('d.m.Y',strtotime(@lastDate))}}</h4>
+            <h4>{{'{0,date}', strtotime(@lastDate) | format }}</h4>
         </false>
     </check>
     <div class="post-list-item solid">

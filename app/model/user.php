@@ -10,6 +10,7 @@ class User extends Base {
                 'type' => \DB\SQL\Schema::DT_VARCHAR128,
                 'nullable'=>false,
                 'required'=>true,
+                'unique'=>true,
             ),
             'name' => array(
                 'type' => \DB\SQL\Schema::DT_VARCHAR128,
@@ -21,7 +22,8 @@ class User extends Base {
                 'required'=>true,
             ),
             'mail' => array(
-                'type' => \DB\SQL\Schema::DT_VARCHAR256
+                'type' => \DB\SQL\Schema::DT_VARCHAR256,
+                'unique'=>true,
             ),
             'news' => array(
                 'has-many' => array('\Model\Post','author'),
@@ -30,24 +32,6 @@ class User extends Base {
         $table = 'user',
         $db = 'DB';
 
-    /**
-     * check if username already exists
-     * @param $val
-     * @return null
-     */
-    public function set_username($val) {
-        if($this->dry())
-            // new
-            $user = $this->findone(array('username = ?',$val));
-        else // existing
-            $user = $this->findone(array('username = ? and _id != ?',$val,$this->_id));
-        if($user) {
-            $val = NULL;
-            \FlashMessage::instance()->addMessage('This username already exists. Please select a unique username.','warning');
-            \FlashMessage::instance()->setKey('form.username','has-error');
-        }
-        return $val;
-    }
 
     /**
      * crypt password
@@ -77,12 +61,8 @@ class User extends Base {
      * @return null
      */
     public function set_mail($val) {
-        if(!empty($val) && !\Audit::instance()->email($val,false)) {
-            $val = NULL;
-            \FlashMessage::instance()->addMessage('The entered email address is not valid.', 'warning');
-            \FlashMessage::instance()->setKey('form.mail', 'has-error');
-        }
-        return $val;
+        return \Validation::instance()->email($val)
+            ? $val : null;
     }
 
 }

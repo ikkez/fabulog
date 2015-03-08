@@ -7,16 +7,43 @@ class Base extends \DB\Cortex {
 	// persistence settings
 	protected $table, $db, $fieldConf;
 
-	public function __construct()
-	{
+	/**
+	 * init the model
+	 */
+	public function __construct() {
 		$f3 = \Base::instance();
 		$this->table = $f3->get('db_table_prefix').$this->table;
 		$this->db = 'DB';
 		parent::__construct();
+		// validation & error handler
+		$class = get_called_class(); // PHP 5.3 bug
+		$saveHandler = function(\DB\Cortex $self) use($class) {
+			$valid = true;
+			foreach($self->getFieldConfiguration() as $field=>$conf) {
+				if (isset($conf['type'])) {
+					$val = $self->get($field);
+					$model = strtolower(str_replace('\\','.',$class));
+					// check required fields
+					if (isset($conf['required']))
+						$valid = \Validation::instance()->required($val,$field,'error.'.$model.'.'.$field);
+					// check unique
+					if (isset($conf['unique']))
+						$valid = \Validation::instance()->unique($self,$val,$field,'error.'.$model.'.'.$field);
+				}
+			}
+			return $valid;
+		};
+		$this->beforesave($saveHandler);
 	}
 
-	public function updateProperty($filter, $key, $value)
-	{
+	/**
+	 * just a little mass update shortcut
+	 * @param $filter
+	 * @param $key
+	 * @param $value
+	 * @return bool
+	 */
+	public function updateProperty($filter, $key, $value) {
 		$this->load($filter);
 		if ($this->dry()) {
 			return false;

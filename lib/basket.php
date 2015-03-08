@@ -65,7 +65,7 @@ class Basket extends Magic {
 			return $this->id;
 		if (array_key_exists($key,$this->item))
 			return $this->item[$key];
-		user_error(sprintf(self::E_Field,$key));
+		user_error(sprintf(self::E_Field,$key),E_USER_ERROR);
 		return FALSE;
 	}
 
@@ -189,10 +189,12 @@ class Basket extends Magic {
 	/**
 	*	Hydrate item using hive array variable
 	*	@return NULL
-	*	@param $key string
+	*	@param $var array|string
 	**/
-	function copyfrom($key) {
-		foreach (\Base::instance()->get($key) as $key=>$val)
+	function copyfrom($var) {
+		if (is_string($var))
+			$var=\Base::instance()->get($var);
+		foreach ($var as $key=>$val)
 			$this->item[$key]=$val;
 	}
 

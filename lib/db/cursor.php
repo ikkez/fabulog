@@ -89,10 +89,10 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	/**
 	*	Hydrate mapper object using hive array variable
 	*	@return NULL
-	*	@param $key string
+	*	@param $var array|string
 	*	@param $func callback
 	**/
-	abstract function copyfrom($key,$func=NULL);
+	abstract function copyfrom($var,$func=NULL);
 
 	/**
 	*	Populate hive array variable with mapper fields
@@ -106,7 +106,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	Causes a fatal error in PHP 5.3.5if uncommented
 	*	return ArrayIterator
 	**/
-	//abstract function getiterator();
+//	abstract function getiterator();
 
 
 	/**

@@ -70,7 +70,7 @@ class Mapper extends \DB\Cursor {
 	function &get($key) {
 		if ($this->exists($key))
 			return $this->document[$key];
-		user_error(sprintf(self::E_Field,$key));
+		user_error(sprintf(self::E_Field,$key),E_USER_ERROR);
 	}
 
 	/**
@@ -297,11 +297,12 @@ class Mapper extends \DB\Cursor {
 	/**
 	*	Hydrate mapper object using hive array variable
 	*	@return NULL
-	*	@param $key string
+	*	@param $var array|string
 	*	@param $func callback
 	**/
-	function copyfrom($key,$func=NULL) {
-		$var=\Base::instance()->get($key);
+	function copyfrom($var,$func=NULL) {
+		if (is_string($var))
+			$var=\Base::instance()->get($var);
 		if ($func)
 			$var=call_user_func($func,$var);
 		foreach ($var as $key=>$val)

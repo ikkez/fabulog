@@ -19,12 +19,15 @@ abstract class Base {
 	 * init the View
 	 */
 	public function beforeroute() {
-		$this->response = \View\Backend::instance();
+		$this->response = new \View\Frontend();
 	}
 
 	/**
-	 * kick start the View, which finally creates the response
-	 * based on our previously set content data
+	 * kick start the View, which creates the response
+	 * based on our previously set content data.
+	 * finally echo the response or overwrite this method
+	 * and do something else with it.
+	 * @return string
 	 */
 	public function afterroute() {
 		if (!$this->response)

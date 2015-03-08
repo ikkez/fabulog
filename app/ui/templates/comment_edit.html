@@ -1,19 +1,19 @@
-<a class="btn btn-default" href="{{ @BASE.@SESSION.LastPageURL }}"><i class="glyphicon glyphicon-chevron-left"></i> back zu list</a>
+<a class="btn btn-default" href="{{ @BASE.@SESSION.LastPageURL }}"><i class="glyphicon glyphicon-chevron-left"></i> back to list</a>
 <h2>Edit Comment</h2>
-<form action="admin/comment/save/{{@content._id}}" method="post">
+<form action="admin/comment/edit/{{@comment._id}}" method="post">
 <div class="row solid">
     <div class="col-md-12">
         <dl class="dl-horizontal w120 comment-element">
             <dt><i class="glyphicon glyphicon-share-alt"></i> Answer to</dt>
-            <dd><a href="{{@content.post.slug}}" target="_blank">{{ @content.post.title | esc }}</a></dd>
+            <dd><a href="{{@comment.post.slug}}" target="_blank">{{ @comment.post.title | esc }}</a></dd>
             <dt><i class="glyphicon glyphicon-user"></i> Name</dt>
-            <dd>{{@content.author_name | esc}}</dd>
+            <dd>{{@comment.author_name | esc}}</dd>
             <dt><i class="glyphicon glyphicon-envelope"></i> E-Mail</dt>
-            <dd>{{@content.author_email | esc}}</dd>
+            <dd>{{@comment.author_email | esc}}</dd>
             <dt><i class="glyphicon glyphicon-calendar"></i> Date</dt>
-            <dd>{{date('d.m.Y, H:i',strtotime(@content.datetime))}}</dd>
+            <dd>{{ '{0,date}', strtotime(@comment.datetime) | format }}</dd>
             <dt><i class="glyphicon glyphicon-comment"></i> Message</dt>
-            <dd><textarea name="message" class="form-control" rows="8">{{@content.message | esc }}</textarea></dd>
+            <dd><textarea name="message" class="form-control" rows="8">{{@comment.message | esc }}</textarea></dd>
             <dd>
                 <br/>
                     <button type="submit" class="btn btn-success">

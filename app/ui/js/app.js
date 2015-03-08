@@ -2,17 +2,17 @@ $(function () {
 
     // datepicker
     $('.datepicker').datepicker({
-        format: 'dd.mm.yyyy',
+        format: dp_format,
         weekStart: 1
     });
-
 
     // tag multiselect and auto-complete
     if($("#input-tags").length > 0) {
 
+        varTags = $('<textarea />').html($("#input-tags").attr('data-value')).text();
         var tags = $("#input-tags").tagsManager({
             tagsContainer: '#taglist',
-            prefilled: $("#input-tags").attr('data-value').split(',')
+            prefilled: varTags.split(',')
         });
 
         $("#input-tags").typeahead({
@@ -29,7 +29,7 @@ $(function () {
 
 
     // tooltips
-    $('.bs-tooltip').tooltip();
+    $('.bs-tooltip, [data-toggle="tooltip"]').tooltip();
 
 
     // editor

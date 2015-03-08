@@ -37,10 +37,10 @@ class setup {
 			$user->name = 'Administrator';
 			$user->password = 'fabulog';
 			$user->save();
-			\FlashMessage::instance()->addMessage('Admin User created,'
+			\Flash::instance()->addMessage('Admin User created,'
 				.' username: admin, password: fabulog','success');
 		}
-		\FlashMessage::instance()->addMessage('Setup complete','success');
+		\Flash::instance()->addMessage('Setup complete','success');
 	}
 
 	public function uninstall()

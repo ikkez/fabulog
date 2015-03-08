@@ -9,7 +9,7 @@ class Frontend extends Base {
         $f3 = \Base::instance();
         if($this->data)
             $f3->mset($this->data);
-        echo \Template::instance()->render('templates/layout.html');
+        return \Template::instance()->render('templates/layout.html');
     }
 
 }

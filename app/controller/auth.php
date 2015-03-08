@@ -9,6 +9,13 @@ class Auth extends Base {
         $response;
 
     /**
+     * init the View
+     */
+    public function beforeroute() {
+        $this->response = new \View\Backend();
+    }
+
+    /**
      * check login state
      * @return bool
      */
@@ -51,7 +58,7 @@ class Auth extends Base {
                     else $f3->reroute('/admin');
                 }
             }
-            \FlashMessage::instance()->addMessage('Wrong Username/Password', 'danger');
+            \Flash::instance()->addMessage('Wrong Username/Password', 'danger');
         }
         $this->response->setTemplate('templates/login.html');
     }

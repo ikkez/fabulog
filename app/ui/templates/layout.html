@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
-    <meta charset="{{@$ENCODING}}">
+    <meta charset="{{@ENCODING}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{@UI}}ico/favicon.png">
     <title>fabulog backend - {{@CONFIG.blog_title}}</title>
-    <link href="{{@UI}}css/bootstrap.min.css"    rel="stylesheet">
+    <link href="{{@UI}}css/bootstrap.min.css" rel="stylesheet">
     <link href="{{@UI}}css/datepicker.css" rel="stylesheet">
     <link href="{{@UI}}css/tagmanager.css" rel="stylesheet">
     <link href="{{@UI}}css/backend.css" rel="stylesheet">
@@ -56,15 +56,11 @@
                 <li {{(is_int(strpos(@PARAMS.0,'user'))?'class="active"':'')}}>
                     <a href="admin/user"><i class="glyphicon glyphicon-user"></i> User</a>
                 </li>
-                <li class="pull-right"><a href="logout"><i class="glyphicon glyphicon-off"></i> <small>logout</small></a></li>
+                <li class="pull-right"><a href="logout" data-toggle="tooltip" data-placement="bottom" title="Logout"><i class="glyphicon glyphicon-off"></i></a></li>
                 <li class="pull-right">
-                    <a href="admin/settings"><i class="glyphicon glyphicon-wrench"></i>
-                        <small>settings</small>
-                    </a>
+                    <a href="admin/settings" data-toggle="tooltip" data-placement="bottom" title="Settings"><i class="glyphicon glyphicon-wrench"></i></a>
                 </li><li class="pull-right">
-                    <a href="{{@BASE}}"><i class="glyphicon glyphicon-home"></i>
-                        <small>display blog</small>
-                    </a>
+                    <a href="{{@BASE}}" data-toggle="tooltip" data-placement="bottom" title="View&nbsp;Blog"><i class="glyphicon glyphicon-home"></i></a>
                 </li>
             </ul>
         </div>
@@ -78,7 +74,7 @@
         <include if="{{isset(@LAYOUT)}}" href="{{'templates/'.@LAYOUT}}"/>
     </div>
 
-    <div class="stats">{{ \Base::instance()->format('Page rendered in {0} msecs / Memory usage {1} KB',round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</div>
+    <p class="stats">{{ \Base::instance()->format('Page rendered by fabulog v{0}, using {1} in {2} msecs / Memory usage {3} KB',@APP_VERSION,@CONFIG->ACTIVE_DB,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</p>
 </div>
 
 <!-- /.container -->

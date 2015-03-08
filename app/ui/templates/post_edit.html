@@ -8,35 +8,38 @@
 </check>
 <div class="row solid">
     <div class="col-lg-12">
-        <form id="post-form" action="admin/post/{{(isset(@PARAMS.id))?'save/'.@PARAMS.id:''}}" method="post" class="form-horizontal" role="form">
-            <F3:check if="{{isset(@content) && isset(@content.title)}}">
-                <div class="pull-right">written by: {{ @content.author.name }}</div>
+        <form id="post-form" action="admin/post/{{(isset(@PARAMS.id))?'edit/'.@PARAMS.id:'create'}}" method="post" class="form-horizontal" role="form">
+            <F3:check if="{{isset(@post) && !empty(@post.author._id)}}">
+                <div class="pull-right">written by: {{ @post.author.name }}</div>
             </F3:check>
-            <div class="form-group">
+            <div class="form-group {{@FLASH->getKey('error.model.post.title')}}">
                 <div class="col-sm-5">
                     <label for="input-title">Title</label>
-                    <input {{(isset(@content.title)?'value="'.@content.title.'"':'')}} type="text" name="title" class="form-control" id="input-title" placeholder="Give your post a meaningful headline">
+                    <input type="text" name="title" class="form-control" id="input-title" placeholder="Give your post a meaningful headline" />
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group {{@FLASH->getKey('error.model.post.publish_date')}}">
                 <div class="col-sm-3">
                     <label for="input-date">Publish Date</label>
+                    <script>
+                        var dp_format = '{{@DP_FORMAT}}';
+                    </script>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                        <input type="text" name="publish_date" class="form-control datepicker" id="input-date" value="{{!empty(@content.publish_date) ? date('d.m.Y',strtotime(@content.publish_date)) : date('d.m.Y')}}">
+                        <input type="text" name="publish_date" class="form-control datepicker" id="input-date" />
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-12">
-                    <check if="{{ isset(@content.image) && @content.image }}">
-                        <img id="post-image" class="thumbnail" src="{{ @content.image }}" alt=""/>
+                <div class="col-sm-4">
+                    <check if="{{ isset(@POST.image) && @POST.image }}">
+                        <img id="post-image" class="thumbnail" src="{{ @POST.image }}" alt=""/>
                     </check>
                     <span id="upload-btn" class="fileinput-button">
                         <p><i class="glyphicon glyphicon-picture"></i><br />Upload an Image</p>
                         <!-- The file input field used as target for the file upload widget -->
-                        <input id="input-image" type="hidden" name="image" value="{{isset(@content.image)?@content.image:''}}">
-                        <input id="fileupload" type="file" name="fileupload">
+                        <input id="input-image" type="hidden" name="image" value="{{isset(@POST.image)?@POST.image:''}}" />
+                        <input id="fileupload" type="file" name="fileupload" />
                     </span>
                 </div>
             </div>
@@ -45,21 +48,21 @@
                 <div class="col-sm-12">
                     <label for="input-text">Teaser Text</label>
                     <span class="help-block">This is a little introduction text that mark out your article on overview pages or in RSS feed.</span>
-                    <textarea class="form-control" name="teaser" id="input-teaser" placeholder="a summary of your Post" rows="3">{{isset(@content.teaser)?@content.teaser:''}}</textarea>
+                    <textarea class="form-control" name="teaser" id="input-teaser" placeholder="a summary of your Post" rows="3">{{isset(@POST.teaser)?@POST.teaser:''}}</textarea>
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group {{@FLASH->getKey('error.model.post.text')}}">
                 <div class="col-sm-12">
                     <label for="input-text">Body Text</label>
                     <F3:switch expr="{{@text_editor}}">
                         <case value="sommernote">
-                            <input type="hidden" name="text" id="input-text">
-                            <div id="blog-text">{{isset(@content.text)?@content.text:''}}</div>
+                            <input type="hidden" name="text" id="input-text"/>
+                            <div id="blog-text">{{isset(@POST.text)?@POST.text:'' | raw }}</div>
                         </case>
                         <default>
                             <textarea class="form-control" name="text" id="input-text" placeholder="Your Blog Post text" rows="12">
-                                {{isset(@content.text)?@content.text:''}}
+                                {{isset(@POST.text)?@POST.text:'' | raw }}
                             </textarea>
                         </default>
                     </F3:switch>
@@ -71,7 +74,7 @@
                     <div id="taglist"></div>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
-                        <input type="text" name="tags" placeholder="Tag Name" class="form-control tm-input" id="input-tags" data-value="{{(isset(@content) && !@content->dry() && is_object(@content.tags))? implode(',',@content.tags->getAll('title')) :''}}">
+                        <input type="text" name="tags" placeholder="Tag Name" class="form-control tm-input" id="input-tags" data-value="{{@POST.tags | esc}}" value />
                     </div>
                 </div>
             </div>
@@ -80,13 +83,13 @@
                     <label>Publish state</label>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="published" id="published1" value="false" {{((isset(@content.published) && @content.published==false)?'checked':'')}}>
+                            <input type="radio" name="published" id="published1" value="0" />
                             Draft
                         </label>
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="published" id="published2" value="true" {{((isset(@content.published) && @content.published==true)?'checked':'')}}>
+                            <input type="radio" name="published" id="published2" value="1" />
                             Published
                         </label>
                     </div>
@@ -97,19 +100,18 @@
                     <label>Allow comments</label>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="enable_comments" value="false" {{((isset(@content.enable_comments) && @content.enable_comments==false)?'checked':'')}}>
+                            <input type="radio" name="enable_comments" value="0" />
                             No
                         </label>
                     </div>
                     <div class="radio">
                         <label>
-                            <input type="radio" name="enable_comments" value="true" {{((isset(@content.enable_comments) && @content.enable_comments==true)?'checked':'')}}>
+                            <input type="radio" name="enable_comments" value="1" />
                             Yes
                         </label>
                     </div>
                 </div>
             </div>
-
 
             <button type="submit" class="btn btn-primary">Save</button>
 

@@ -4,16 +4,17 @@
             <h3 class="panel-title">Dashboard</h3>
         </div>
         <div class="panel-body">
-            <p>Hey, {{ @BACKEND_USER.name }}. This is the fabulog admin center, or at least it should become something like that ;)</p>
-            <p>fabulog currently has the following features:</p>
+            <p>Hey, {{ @BACKEND_USER.name }}. This is <strong>fabulog v{{ @APP_VERSION }}</strong> ;)</p>
+            <p>fabulog is currently just a playground and demo blog application. It has the following features:</p>
             <ul>
-                <li>Jig, SQL and Mongo database support with Cortex ORM</li>
-                <li>Post module with publishing by state and date</li>
-                <li>Tag management</li>
+                <li>It's powered by Fat-Free Framework 3.4!</li>
+                <li>Cortex ORM with Jig, SQL and Mongo database support</li>
+                <li>Post module with drafts and publishing by date</li>
+                <li>add Tags to Posts with auto-completion</li>
                 <li>Comment module with backend moderation</li>
                 <li>simple User management module</li>
-                <li>Sommernote Bootstrap WYSIWYG editor</li>
-                <li>powered by fat-free framework</li>
+                <li>Twitter Bootstrap Backend, with Sommernote WYSIWYG editor</li>
+                <li>F3 FooForms plugin for handling all form data, yeah!</li>
             </ul>
         </div>
     </div>

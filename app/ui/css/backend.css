@@ -149,3 +149,15 @@ body {
     float: left;
     margin-right: 10px;
 }*/
+
+.error-trace {
+    background-color: #191b1d;
+}
+.error-trace code {
+    background-color: transparent;
+    white-space: pre-wrap;       /* CSS 3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}

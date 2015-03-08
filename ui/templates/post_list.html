@@ -1,35 +1,55 @@
-<F3:check if="{{ isset(@headline) }}">
-	<h1>{{ @headline }}</h1>
-	<hr>
-</F3:check>
+<div class="row">
+    <div class="col-md-8">
 
-<F3:check if="{{ @content }}">
+        <F3:check if="{{ isset(@headline) }}">
+            <h1>{{ @headline }}</h1>
+            <hr>
+        </F3:check>
 
-<F3:repeat group="{{ @content.subset }}" value="{{ @post }}">
-<div class="post-entry">
-    <h2><a href="{{ @post.slug }}">{{@post.title | esc}}</a></h2>
+        <F3:check if="{{ @content }}">
 
-    <p>
-        <span class="meta date"><i class="glyphicon glyphicon-calendar"></i> {{date('d.m.Y',strtotime(@post.publish_date))}}</span>
-        <F3:check if="{{ @post.tags }}">
-        <span class="meta tags"><i class="glyphicon glyphicon-tags"></i>
-            <F3:repeat group="{{ @post.tags }}" value="{{ @tag }}">
-            <a href="tag/{{ @tag.slug }}" class="badge">{{@tag.title | esc}}</a>
+        <F3:repeat group="{{ @content.subset }}" value="{{ @post }}">
+        <div class="post-entry">
+            <h2><a href="{{ @post.slug }}">{{@post.title | esc}}</a></h2>
+
+            <p>
+                <span class="meta date"><i class="glyphicon glyphicon-calendar"></i> {{'{0,date}', strtotime(@post.publish_date) | format}}</span>
+                <F3:check if="{{ @post.tags }}">
+                <span class="meta tags"><i class="glyphicon glyphicon-tags"></i>
+                    <F3:repeat group="{{ @post.tags }}" value="{{ @tag }}">
+                    <a href="tag/{{ @tag.slug }}" class="badge">{{@tag.title | esc}}</a>
+                    </F3:repeat>
+                </span>
+                </F3:check>
+                <F3:check if="{{ @post.enable_comments || !isset(@post.enable_comments) }}">
+                <span class="meta comments"><i class="glyphicon glyphicon-comment"></i> Comments: {{ @post.count_comments ?: 0 }}</span>
+                </F3:check>
+            </p>
+
+            <hr />
+            <set text="{{ @post.text }}" />
+            <p>{{@post.teaser ?: substr(\Base::instance()->scrub(@text),0,350) | esc }}...</p>
+            <a href="{{ @post.slug }}" class="btn btn-primary">Read more</a>
+        </div>
+        </F3:repeat>
+
+        <F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{@content.limit}}" token-prefix="page-" link-path="/page/"/>
+
+        </F3:check>
+    </div>
+
+    <div class="col-md-4">
+        <h4>active Tags with count</h4>
+        <div>
+            <F3:repeat group="{{ @@tag_cloud }}" value="{{ @tag }}">
+                <F3:check if="{{ @tag.count_post }}">
+                    <a class="badge" href="tag/{{@tag.slug}}">{{ @tag.title }} {{ @tag.count_post > 1 ? '['.@tag.count_post.']' :'' }}</a>
+                </F3:check>
             </F3:repeat>
-        </span>
-        </F3:check>
-        <F3:check if="{{ @post.enable_comments || !isset(@post.enable_comments) }}">
-        <span class="meta comments"><i class="glyphicon glyphicon-comment"></i> Comments: {{ @post.count_comments ?: 0 }}</span>
-        </F3:check>
-    </p>
-
-    <hr />
-    <set text="{{ @post.text }}" />
-    <p>{{@post.teaser ?: substr(\Base::instance()->scrub(@text),0,350) | esc }}...</p>
-    <a href="{{ @post.slug }}" class="btn btn-primary">Read more</a>
+        </div>
+        {*<h4>Search</h4>
+        <h4>Last Posts</h4>
+        <h4>Last Comments</h4>
+        <h4>Meta Pages</h4>*}
+    </div>
 </div>
-</F3:repeat>
-
-<F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{@content.limit}}" token-prefix="page-" link-path="/page/"/>
-
-</F3:check>

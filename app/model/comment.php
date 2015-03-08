@@ -35,30 +35,13 @@ class Comment extends Base {
         $db = 'DB';
 
     /**
-     * save new comment
-     * @param $postID
-     * @return bool|mixed
+     * validate email address
+     * @param $val
+     * @return null
      */
-    public function addToPost($postID)
-    {
-        $f3 = \Base::instance();
-        foreach($this->fieldConf as $key => $conf) {
-            // check requirements
-            if (isset($this->fieldConf[$key]['required'])
-                && $this->fieldConf[$key]['required'] == TRUE
-                && (!$f3->exists('POST.'.$key) || empty($_POST[$key]) )
-            ) {
-                \FlashMessage::instance()->addMessage('Please fill out all required fields',
-                    'warning');
-                return false;
-            }
-        }
-        $this->set('author_name',$f3->get('POST.author_name'));
-        $this->set('author_email',$f3->get('POST.author_email'));
-        $this->set('message',$f3->get('POST.message'));
-        $this->set('post', $postID);
-        $this->set('approved', \Config::instance()->get('auto_approve_comments') ? 1 : 0 );
-        return $this->save();
+    public function set_author_email($val) {
+        return \Validation::instance()->email($val,'error.model.comment.author_email')
+            ? $val : null;
     }
 
     static public function countNew() {

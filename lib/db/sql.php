@@ -157,6 +157,12 @@ class SQL {
 					$keys[]='/'.preg_quote(is_numeric($key)?chr(0).'?':$key).
 						'/';
 				}
+				if ($log)
+					$this->log.=date('r').' ('.
+						sprintf('%.1f',1e3*(microtime(TRUE)-$now)).'ms) '.
+						'[CACHED] '.
+						preg_replace($keys,$vals,
+							str_replace('?',chr(0).'?',$cmd),1).PHP_EOL;
 			}
 			elseif (is_object($query=$this->pdo->prepare($cmd))) {
 				foreach ($arg as $key=>$val) {
@@ -174,13 +180,18 @@ class SQL {
 					$keys[]='/'.preg_quote(is_numeric($key)?chr(0).'?':$key).
 						'/';
 				}
+				if ($log)
+					$this->log.=date('r').' ('.
+						sprintf('%.1f',1e3*(microtime(TRUE)-$now)).'ms) '.
+						preg_replace($keys,$vals,
+							str_replace('?',chr(0).'?',$cmd),1).PHP_EOL;
 				$query->execute();
 				$error=$query->errorinfo();
 				if ($error[0]!=\PDO::ERR_NONE) {
 					// Statement-level error occurred
 					if ($this->trans)
 						$this->rollback();
-					user_error('PDOStatement: '.$error[2]);
+					user_error('PDOStatement: '.$error[2],E_USER_ERROR);
 				}
 				if (preg_match('/^\s*'.
 					'(?:CALL|EXPLAIN|SELECT|PRAGMA|SHOW|RETURNING|EXEC)\b/is',
@@ -210,15 +221,9 @@ class SQL {
 					// PDO-level error occurred
 					if ($this->trans)
 						$this->rollback();
-					user_error('PDO: '.$error[2]);
+					user_error('PDO: '.$error[2],E_USER_ERROR);
 				}
 			}
-			if ($log)
-				$this->log.=date('r').' ('.
-					sprintf('%.1f',1e3*(microtime(TRUE)-$now)).'ms) '.
-					(empty($cached)?'':'[CACHED] ').
-					preg_replace($keys,$vals,
-						str_replace('?',chr(0).'?',$cmd),1).PHP_EOL;
 		}
 		if ($this->trans && $auto)
 			$this->commit();
@@ -316,11 +321,11 @@ class SQL {
 						$rows[$row[$val[1]]]=array(
 							'type'=>$row[$val[2]],
 							'pdo_type'=>
-								preg_match('/int\b|int(?=eger)|bool/i',
-									$row[$val[2]],$parts)?
-								constant('\PDO::PARAM_'.
-									strtoupper($parts[0])):
-								\PDO::PARAM_STR,
+								preg_match('/int\b|integer/i',$row[$val[2]])?
+									\PDO::PARAM_INT:
+									(preg_match('/bool/i',$row[$val[2]])?
+										\PDO::PARAM_BOOL:
+										\PDO::PARAM_STR),
 							'default'=>is_string($row[$val[3]])?
 								preg_replace('/^\s*([\'"])(.*)\1\s*/','\2',
 								$row[$val[3]]):$row[$val[3]],

@@ -418,7 +418,7 @@ class Web extends Prefab {
 		foreach ($flags as $key=>$val)
 			if ($val)
 				return $this->wrapper=$key;
-		user_error(E_Request);
+		user_error(E_Request,E_USER_ERROR);
 	}
 
 	/**
@@ -432,7 +432,7 @@ class Web extends Prefab {
 			$new=array($new);
 		foreach ($new as $hdr) {
 			$old=preg_grep('/'.preg_quote(strstr($hdr,':',TRUE),'/').':.+/',
-					$old,PREG_GREP_INVERT);
+				$old,PREG_GREP_INVERT);
 			array_push($old,$hdr);
 		}
 	}
@@ -537,7 +537,7 @@ class Web extends Prefab {
 	*	@param $header bool
 	*	@param $path string
 	**/
-	function minify($files,$mime=NULL,$header=TRUE,$path='') {
+	function minify($files,$mime=NULL,$header=TRUE,$path=NULL) {
 		$fw=Base::instance();
 		if (is_string($files))
 			$files=$fw->split($files);
@@ -546,7 +546,9 @@ class Web extends Prefab {
 		preg_match('/\w+$/',$files[0],$ext);
 		$cache=Cache::instance();
 		$dst='';
-		foreach ($fw->split($path?:$fw->get('UI').';./') as $dir)
+		if (!isset($path))
+			$path=$fw->get('UI').';./';
+		foreach ($fw->split($path,FALSE) as $dir)
 			foreach ($files as $file)
 				if (is_file($save=$fw->fixslashes($dir.$file))) {
 					if ($fw->get('CACHE') &&
@@ -641,7 +643,7 @@ class Web extends Prefab {
 							if (ctype_space($src[$ptr])) {
 								if ($ptr+1<strlen($src) &&
 									preg_match('/[\w'.($ext[0]=='css'?
-										'#\.+\-*()\[\]':'\$').']{2}|'.
+										'#\.%+\-*()\[\]':'\$').']{2}|'.
 										'[+\-]{2}/',
 										substr($data,-1).$src[$ptr+1]))
 									$data.=' ';

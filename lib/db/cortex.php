@@ -1,27 +1,27 @@
 <?php
 
 /**
-    Cortex - a general purpose mapper for the PHP Fat-Free Framework
-
-    The contents of this file are subject to the terms of the GNU General
-    Public License Version 3.0. You may not use this file except in
-    compliance with the license. Any of the license terms and conditions
-    can be waived if you get permission from the copyright holder.
-
-    crafted by   __ __     __
-                |__|  |--.|  |--.-----.-----.
-                |  |    < |    <|  -__|-- __|
-                |__|__|__||__|__|_____|_____|
-
-    Copyright (c) 2014 by ikkez
-    Christian Knuth <ikkez0n3@gmail.com>
-    https://github.com/ikkez/F3-Sugar/
-
-        @package DB
-        @version 1.3.0-dev
-        @since 24.04.2012
-        @date 02.04.2014
- **/
+ *  Cortex - a general purpose mapper for the PHP Fat-Free Framework
+ *
+ *  The contents of this file are subject to the terms of the GNU General
+ *  Public License Version 3.0. You may not use this file except in
+ *  compliance with the license. Any of the license terms and conditions
+ *  can be waived if you get permission from the copyright holder.
+ *
+ *  crafted by   __ __     __
+ *              |__|  |--.|  |--.-----.-----.
+ *              |  |    < |    <|  -__|-- __|
+ *              |__|__|__||__|__|_____|_____|
+ *
+ *  Copyright (c) 2014 by ikkez
+ *  Christian Knuth <ikkez0n3@gmail.com>
+ *  https://github.com/ikkez/F3-Sugar/
+ *
+ *  @package DB
+ *  @version 1.3.1-dev
+ *  @since 24.04.2012
+ *  @date 19.01.2015
+ */
 
 namespace DB;
 use DB\SQL\Schema;
@@ -1002,7 +1002,7 @@ class Cortex extends Cursor {
 	public function erase($filter = null)
 	{
 		$filter = $this->queryParser->prepareFilter($filter, $this->dbsType);
-		if ((!$filter && $this->emit('beforeerase')!==false) || $filter) {
+		if (!$filter && $this->emit('beforeerase')!==false) {
 			if ($this->fieldConf) {
 				foreach($this->fieldConf as $field => $conf)
 					if (isset($conf['has-many']) &&
@@ -1010,10 +1010,10 @@ class Cortex extends Cursor {
 						$this->set($field,null);
 				$this->save();
 			}
+			$this->mapper->erase();
+			$this->emit('aftererase');
+		} elseif($filter)
 			$this->mapper->erase($filter);
-			if (!$filter)
-				$this->emit('aftererase');
-		}
 	}
 
 	/**
@@ -1031,9 +1031,16 @@ class Cortex extends Cursor {
 				return false;
 			$result=$this->update();
 		}
+		// update changed collections
+		$fields = $this->fieldConf;
+		if ($fields)
+			foreach($fields as $key=>$conf)
+				if (!empty($this->fieldsCache[$key]) && $this->fieldsCache[$key] instanceof CortexCollection
+					&& $this->fieldsCache[$key]->hasChanged())
+					$this->set($key,$this->fieldsCache[$key]->getAll('_id',true));
+
 		// m:m save cascade
 		if (!empty($this->saveCsd)) {
-			$fields = $this->fieldConf;
 			foreach($this->saveCsd as $key => $val) {
 				if($fields[$key]['relType'] == 'has-many') {
 					$relConf = $fields[$key]['has-many'];
@@ -1065,6 +1072,7 @@ class Cortex extends Cursor {
 					$val->save();
 				}
 			}
+			$this->saveCsd = array();
 		}
 		$this->emit($new?'afterinsert':'afterupdate');
 		return $result;
@@ -1283,9 +1291,11 @@ class Cortex extends Cursor {
 			$schema = new Schema($this->db);
 			$table = $schema->alterTable($this->table);
 			// add missing field
-			if(!in_array($key,$table->getCols())) {
+			if (!in_array($key,$table->getCols())) {
 				// determine data type
-				if (is_int($val)) $type = $schema::DT_INT;
+				if (isset($this->fieldConf[$key]) && isset($this->fieldConf[$key]['type']))
+					$type = $this->fieldConf[$key]['type'];
+				elseif (is_int($val)) $type = $schema::DT_INT;
 				elseif (is_double($val)) $type = $schema::DT_DOUBLE;
 				elseif (is_float($val)) $type = $schema::DT_FLOAT;
 				elseif (is_bool($val)) $type = $schema::DT_BOOLEAN;
@@ -1459,7 +1469,7 @@ class Cortex extends Cursor {
 						}
 						$result = $cx->getSubset($key, array($this->get($toConf[1])));
 						$this->fieldsCache[$key] = $result ? (($type == 'has-one')
-							? $result[0][0] : $result[0]) : NULL;
+							? $result[0][0] : CortexCollection::factory($result[0])) : NULL;
 					} else {
 						$crit = array($fromConf[1].' = ?', $this->get($toConf[1],true));
 						$crit = $this->mergeWithRelFilter($key, $crit);
@@ -1481,6 +1491,10 @@ class Cortex extends Cursor {
 					} else
 						$mmTable = $fromConf['refTable'];
 					// create mm table mapper
+					if (!$this->get($id,true)) {
+						$this->fieldsCache[$key] = null;
+						return $this->fieldsCache[$key];
+					}
 					$rel = $this->getRelInstance(null,array('db'=>$this->db,'table'=>$mmTable));
 					if ($this->collectionID && $this->smartLoading) {
 						$cx = CortexCollection::instance($this->collectionID);
@@ -1513,7 +1527,8 @@ class Cortex extends Cursor {
 						}
 						// fetch subset from preloaded rels using cached pivot keys
 						$fkeys = $cx->getSubset($key.'_pivot', array($this->get($id)));
-						$this->fieldsCache[$key] = $fkeys ? $cx->getSubset($key, $fkeys[0]) : NULL;
+						$this->fieldsCache[$key] = $fkeys ?
+							CortexCollection::factory($cx->getSubset($key, $fkeys[0])) : NULL;
 					} // no collection
 					else {
 						// find foreign keys
@@ -1576,7 +1591,7 @@ class Cortex extends Cursor {
 							$cx->setRelSet($key, $relSet ? $relSet->getBy($relConf[1]) : NULL);
 						}
 						// get a subset of the preloaded set
-						$this->fieldsCache[$key] = $cx->getSubset($key, $fkeys);
+						$this->fieldsCache[$key] = CortexCollection::factory($cx->getSubset($key, $fkeys));
 					} else {
 						// load foreign models
 						$filter = array($relConf[1].' IN ?', $fkeys);
@@ -1721,17 +1736,10 @@ class Cortex extends Cursor {
 						// cast relations
 						$val = (($relType == 'belongs-to-one' || $relType == 'belongs-to-many')
 							&& !$mp->exists($key)) ? NULL : $mp->get($key);
-						if (is_array($val) || is_object($val)) {
-							if ($relType == 'belongs-to-one' || $relType == 'has-one')
-								// single object
-								$val = $val->cast(null, $rel_depths);
-							elseif ($relType == 'belongs-to-many' || $relType == 'has-many')
-								// multiple objects
-								foreach ($val as $k => $item)
-									$val[$k] = is_object($item) ? $item->cast(null, $rel_depths) : null;
-						}
-						if ($val instanceof CortexCollection)
-							$val = $val->expose();
+						if ($val instanceof Cortex)
+							$val = $val->cast(null, $rel_depths);
+						elseif ($val instanceof CortexCollection)
+							$val = $val->castAll($rel_depths);
 					}
 					// decode array fields
 					elseif (isset($this->fieldConf[$key]['type'])) {
@@ -2318,6 +2326,7 @@ class CortexCollection extends \ArrayIterator {
 	protected
 		$relSets = array(),
 		$pointer = 0,
+		$changed = false,
 		$cid;
 
 	const
@@ -2342,18 +2351,28 @@ class CortexCollection extends \ArrayIterator {
 	 * set a collection of models
 	 * @param $models
 	 */
-	function setModels($models) {
+	function setModels($models,$init=true) {
 		array_map(array($this,'add'),$models);
+		if ($init)
+			$this->changed = false;
 	}
 
 	/**
 	 * add single model to collection
 	 * @param $model
 	 */
-	function add(Cortex $model)
-	{
+	function add(Cortex $model) {
 		$model->addToCollection($this->cid);
 		$this->append($model);
+	}
+
+	public function offsetSet($i, $val) {
+		$this->changed=true;
+		parent::offsetSet($i,$val);
+	}
+
+	public function hasChanged() {
+		return $this->changed;
 	}
 
 	/**
@@ -2400,9 +2419,11 @@ class CortexCollection extends \ArrayIterator {
 			trigger_error(sprintf(self::E_SubsetKeysValue,gettype($keys)));
 		if (!$this->hasRelSet($prop) || !($relSet = $this->getRelSet($prop)))
 			return null;
-		foreach ($keys as &$key)
+		foreach ($keys as &$key) {
 			if ($key instanceof \MongoId)
 				$key = (string) $key;
+			unset($key);
+		}
 		return array_values(array_intersect_key($relSet, array_flip($keys)));
 	}
 
@@ -2494,6 +2515,12 @@ class CortexCollection extends \ArrayIterator {
 		}
 		foreach ($del as $ii)
 			unset($this[$ii]);
+	}
+
+	static public function factory($records) {
+		$cc = new self();
+		$cc->setModels($records);
+		return $cc;
 	}
 
 	/**

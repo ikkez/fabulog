@@ -9,6 +9,13 @@ class Dashboard extends Base {
         $response;
 
     /**
+     * init the View
+     */
+    public function beforeroute() {
+        $this->response = new \View\Backend();
+    }
+
+    /**
      * fetch data for an overview page
      */
     public function main($f3) {

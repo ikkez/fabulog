@@ -70,13 +70,14 @@ class Post extends Base {
 
 	/**
 	 * set and add new tags to the post entity
-	 * @param $val
+	 * @param string $val
 	 * @return array
 	 */
 	public function set_tags($val) {
 		if (!empty($val)) {
 			$tagsArr = \Base::instance()->split($val);
 			$tag_res = new Tag();
+			$tags = array();
 			// find IDs of known Tags
 			$known_tags = $tag_res->find(array('title IN ?', $tagsArr));
 			if ($known_tags) {
@@ -99,14 +100,12 @@ class Post extends Base {
 	}
 
 
-	public function save()
-	{
+	public function save() {
 		/** @var Base $f3 */
 		$f3 = \Base::instance();
 		if(!$this->author)
 			$this->author = $f3->get('BACKEND_USER')->_id;
 		return parent::save();
 	}
-
 
 }
