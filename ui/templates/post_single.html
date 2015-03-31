@@ -17,7 +17,7 @@
     </header>
     <hr/>
     <F3:check if="{{ @post.teaser }}">
-        <div class="teaser-text">{{ @post.teaser }}</div>
+        <div class="teaser-text">{{ @post.teaser | esc }}</div>
     </F3:check>
     <F3:check if="{{isset(@post.image) && @post.image}}">
         <figure class="">
