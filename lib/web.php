@@ -133,7 +133,7 @@ class Web extends Prefab {
 			header('Content-Type: '.($mime?:$this->mime($file)));
 			if ($force)
 				header('Content-Disposition: attachment; '.
-					'filename='.basename($file));
+					'filename='.var_export(basename($file),TRUE));
 			header('Accept-Ranges: bytes');
 			header('Content-Length: '.$size);
 			header('X-Powered-By: '.Base::instance()->get('PACKAGE'));
@@ -357,6 +357,7 @@ class Web extends Prefab {
 		if (!$socket)
 			return FALSE;
 		stream_set_blocking($socket,TRUE);
+		stream_set_timeout($socket,$options['timeout']);
 		fputs($socket,$options['method'].' '.$parts['path'].
 			($parts['query']?('?'.$parts['query']):'').' HTTP/1.0'.$eol
 		);
@@ -367,7 +368,8 @@ class Web extends Prefab {
 		$content='';
 		while (!feof($socket) &&
 			($info=stream_get_meta_data($socket)) &&
-			!$info['timed_out'] && $str=fgets($socket,4096))
+			!$info['timed_out'] && !connection_aborted() &&
+			$str=fgets($socket,4096))
 			$content.=$str;
 		fclose($socket);
 		$html=explode($eol.$eol,$content,2);
@@ -711,7 +713,7 @@ class Web extends Prefab {
 			// Can't establish connection
 			return FALSE;
 		// Set connection timeout parameters
-		stream_set_blocking($socket,TRUE);
+		stream_set_blocking($socket,FALSE);
 		stream_set_timeout($socket,ini_get('default_socket_timeout'));
 		// Send request
 		fputs($socket,$addr."\r\n");

@@ -398,15 +398,18 @@ class SQL {
 	*	@param $key
 	**/
 	function quotekey($key) {
-		if ($this->engine=='mysql')
-			$key="`".implode('`.`',explode('.',$key))."`";
-		elseif (preg_match('/sybase|dblib/',$this->engine))
-			$key="'".implode("'.'",explode('.',$key))."'";
-		elseif (preg_match('/sqlite2?|pgsql|oci/',$this->engine))
-			$key='"'.implode('"."',explode('.',$key)).'"';
-		elseif (preg_match('/mssql|sqlsrv|odbc/',$this->engine))
-			$key="[".implode('].[',explode('.',$key))."]";
-		return $key;
+		$delims=array(
+			'mysql'=>'``',
+			'sqlite2?|pgsql|oci'=>'""',
+			'mssql|sqlsrv|odbc|sybase|dblib'=>'[]'
+		);
+		$use='';
+		foreach ($delims as $engine=>$delim)
+			if (preg_match('/'.$engine.'/',$this->engine)) {
+				$use=$delim;
+				break;
+			}
+		return $use[0].implode($use[1].'.'.$use[0],explode('.',$key)).$use[1];
 	}
 
 	/**
@@ -429,7 +432,7 @@ class SQL {
 	function __construct($dsn,$user=NULL,$pw=NULL,array $options=NULL) {
 		$fw=\Base::instance();
 		$this->uuid=$fw->hash($this->dsn=$dsn);
-		if (preg_match('/^.+?(?:dbname|database)=(.+?)(?=;|$)/i',$dsn,$parts))
+		if (preg_match('/^.+?(?:dbname|database)=(.+?)(?=;|$)/is',$dsn,$parts))
 			$this->dbname=$parts[1];
 		if (!$options)
 			$options=array();

@@ -45,7 +45,7 @@ class Image extends \Template\TagHandler {
 		$f3 = \Base::instance();
 		$hash = $f3->hash($path.$f3->serialize($opt));
 		$new_file_name = $hash.'.jpg';
-		$dst_path = $f3->get('UPLOADS').'cache/';
+		$dst_path = $f3->get('TEMP').'img/';
 		$path = explode('/', $path);
 		$file = array_pop($path);
 		if (!is_dir($dst_path))

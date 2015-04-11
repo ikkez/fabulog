@@ -206,7 +206,7 @@ class Mapper extends \DB\Cursor {
 		if (!($cached=$cache->exists($hash=$fw->hash($fw->stringify(
 			array($filter))).'.mongo',$result)) || !$ttl ||
 			$cached[0]+$ttl<microtime(TRUE)) {
-			$result=$this->collection->count($filter);
+			$result=$this->collection->count($filter?:array());
 			if ($fw->get('CACHE') && $ttl)
 				// Save to cache backend
 				$cache->set($hash,$result,$ttl);
@@ -278,7 +278,6 @@ class Mapper extends \DB\Cursor {
 		$result=$this->collection->
 			remove(array('_id'=>$this->document['_id']));
 		parent::erase();
-		$this->skip(0);
 		if (isset($this->trigger['aftererase']))
 			\Base::instance()->call($this->trigger['aftererase'],
 				array($this,$pkey));

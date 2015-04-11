@@ -101,7 +101,10 @@ class Mapper extends \DB\Cursor {
 			return $this->fields[$key]['value']=$val;
 		}
 		// Parenthesize expression in case it's a subquery
-		$this->adhoc[$key]=array('expr'=>'('.$val.')','value'=>NULL);
+		if (isset($this->adhoc[$key]))
+			$this->adhoc[$key]['value']=$val;
+		else
+			$this->adhoc[$key]=array('expr'=>'('.$val.')','value'=>NULL);
 		return $val;
 	}
 
@@ -515,7 +518,6 @@ class Mapper extends \DB\Cursor {
 			unset($field);
 		}
 		parent::erase();
-		$this->skip(0);
 		if (isset($this->trigger['beforeerase']))
 			\Base::instance()->call($this->trigger['beforeerase'],
 				array($this,$pkeys));
@@ -580,10 +582,13 @@ class Mapper extends \DB\Cursor {
 	}
 
 	/**
-	*	Return schema
+	*	Return schema and, if the first argument is provided, update it
 	*	@return array
+	*	@param $fields NULL|array
 	**/
-	function schema() {
+	function schema($fields=null) {
+		if ($fields)
+			$this->fields = $fields;
 		return $this->fields;
 	}
 
@@ -594,6 +599,16 @@ class Mapper extends \DB\Cursor {
 	**/
 	function fields($adhoc=TRUE) {
 		return array_keys($this->fields+($adhoc?$this->adhoc:array()));
+	}
+
+	/**
+	*	Return TRUE if field is not nullable
+	*	@return bool
+	*	@param $field string
+	**/
+	function required($field) {
+		return isset($this->fields[$field]) &&
+			!$this->fields[$field]['nullable'];
 	}
 
 	/**

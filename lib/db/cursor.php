@@ -106,7 +106,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	Causes a fatal error in PHP 5.3.5if uncommented
 	*	return ArrayIterator
 	**/
-//	abstract function getiterator();
+	abstract function getiterator();
 
 
 	/**
@@ -125,6 +125,10 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	*	@param $ttl int
 	**/
 	function findone($filter=NULL,array $options=NULL,$ttl=0) {
+		if (!$options)
+			$options=array();
+		// Override limit
+		$options['limit']=1;
 		return ($data=$this->find($filter,$options,$ttl))?$data[0]:FALSE;
 	}
 
@@ -244,7 +248,7 @@ abstract class Cursor extends \Magic implements \IteratorAggregate {
 	function erase() {
 		$this->query=array_slice($this->query,0,$this->ptr,TRUE)+
 			array_slice($this->query,$this->ptr,NULL,TRUE);
-		$this->ptr=0;
+		$this->skip(0);
 	}
 
 	/**

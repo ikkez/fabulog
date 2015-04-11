@@ -164,12 +164,16 @@ final class Base extends Prefab implements ArrayAccess {
 			}
 		else {
 			$i=0;
-			$url=preg_replace_callback('/@(\w+)|\*/',function($m)use(&$i,$params){
-				$i++;
-				if (isset($m[1]) && array_key_exists($m[1],$params))
-					return $params[$m[1]];
-				return array_key_exists($i,$params)?$params[$i]:$m[0];
-			},$url);
+			$url=preg_replace_callback('/@(\w+)|\*/',
+				function($match) use(&$i,$params) {
+					$i++;
+					if (isset($match[1]) &&
+						array_key_exists($match[1],$params))
+						return $params[$match[1]];
+					return array_key_exists($i,$params)?
+						$params[$i]:
+						$match[0];
+				},$url);
 		}
 		return $url;
 	}
@@ -719,7 +723,7 @@ final class Base extends Prefab implements ArrayAccess {
 	*	@param $str string
 	**/
 	function encode($str) {
-		return @htmlentities($str,$this->hive['BITMASK'],
+		return @htmlspecialchars($str,$this->hive['BITMASK'],
 			$this->hive['ENCODING'])?:$this->scrub($str);
 	}
 
@@ -729,8 +733,7 @@ final class Base extends Prefab implements ArrayAccess {
 	*	@param $str string
 	**/
 	function decode($str) {
-		return html_entity_decode($str,$this->hive['BITMASK'],
-			$this->hive['ENCODING']);
+		return htmlspecialchars_decode($str,$this->hive['BITMASK']);
 	}
 
 	/**
@@ -1013,14 +1016,14 @@ final class Base extends Prefab implements ArrayAccess {
 	}
 
 	/**
-	*	Send HTTP/1.1 status header; Return text equivalent of status code
+	*	Send HTTP status header; Return text equivalent of status code
 	*	@return string
 	*	@param $code int
 	**/
 	function status($code) {
 		$reason=@constant('self::HTTP_'.$code);
 		if (PHP_SAPI!='cli')
-			header('HTTP/1.1 '.$code.' '.$reason);
+			header($_SERVER['SERVER_PROTOCOL'].' '.$code.' '.$reason);
 		return $reason;
 	}
 
@@ -1085,6 +1088,11 @@ final class Base extends Prefab implements ArrayAccess {
 					$_SERVER['REMOTE_ADDR']:''));
 	}
 
+	/**
+	*	Return formatted stack trace
+	*	@return string
+	*	@param $trace array|NULL
+	**/
 	function trace(array $trace=NULL) {
 		if (!$trace) {
 			$trace=debug_backtrace(FALSE);
@@ -1138,10 +1146,12 @@ final class Base extends Prefab implements ArrayAccess {
 			$text='HTTP '.$code.' ('.$req.')';
 		error_log($text);
 		$trace=$this->trace($trace);
-		error_log($trace);
+		foreach (explode("\n",$trace) as $nexus)
+			if ($nexus)
+				error_log($nexus);
 		if ($highlight=PHP_SAPI!='cli' &&
 			$this->hive['HIGHLIGHT'] && is_file($css=__DIR__.'/'.self::CSS))
-			$trace=nl2br($this->highlight($trace));
+			$trace=$this->highlight($trace);
 		$this->hive['ERROR']=array(
 			'status'=>$header,
 			'code'=>$code,
@@ -1150,6 +1160,7 @@ final class Base extends Prefab implements ArrayAccess {
 		);
 		$handler=$this->hive['ONERROR'];
 		$this->hive['ONERROR']=NULL;
+		$eol="\n";
 		if ((!$handler ||
 			$this->call($handler,array($this,$this->hive['PARAMS']),
 				'beforeroute,afterroute')===FALSE) &&
@@ -1166,7 +1177,7 @@ final class Base extends Prefab implements ArrayAccess {
 				'<body>'.$eol.
 					'<h1>'.$header.'</h1>'.$eol.
 					'<p>'.$this->encode($text?:$req).'</p>'.$eol.
-					($debug?('<pre>'.$out.'</pre>'.$eol):'').
+					($this->hive['DEBUG']?('<pre>'.$trace.'</pre>'.$eol):'').
 				'</body>'.$eol.
 				'</html>');
 		if ($this->hive['HALT'])
@@ -1301,7 +1312,8 @@ final class Base extends Prefab implements ArrayAccess {
 		}
 		foreach (explode('|',self::VERBS) as $method)
 			$this->route($method.' '.$url,
-				$class.'->'.strtolower($method),$ttl,$kbps);
+				$class.'->'.$this->hive['PREMAP'].strtolower($method),
+				$ttl,$kbps);
 	}
 
 	/**
@@ -1504,6 +1516,59 @@ final class Base extends Prefab implements ArrayAccess {
 	}
 
 	/**
+	*	Loop until callback returns TRUE (for long polling)
+	*	@return mixed
+	*	@param $func callback
+	*	@param $args array
+	*	@param $timeout int
+	**/
+	function until($func,$args=NULL,$timeout=60) {
+		if (!$args)
+			$args=array();
+		$time=time();
+		$limit=max(0,min($timeout,$max=ini_get('max_execution_time')-1));
+		$out='';
+		$flag=FALSE;
+		$down=FALSE;
+		// Not for the weak of heart
+		while (
+			// Still alive?
+			!connection_aborted() &&
+			// Got time left?
+			(time()-$time+1<$limit) &&
+			// Restart session
+			$flag=@session_start() &&
+			// CAUTION: Callback will kill host if it never becomes truthy!
+			!($out=$this->call($func,$args))) {
+			session_commit();
+			ob_flush();
+			flush();
+			// Hush down
+			sleep(1);
+		}
+		if ($flag) {
+			session_commit();
+			ob_flush();
+			flush();
+		}
+		return $out;
+	}
+
+	/**
+	*	Disconnect HTTP client
+	**/
+	function abort() {
+		@session_start();
+		session_commit();
+		header('Content-Length: 0');
+		while (ob_get_level())
+			ob_end_clean();
+		flush();
+		if (function_exists('fastcgi_finish_request'))
+			fastcgi_finish_request();
+	}
+
+	/**
 	*	Grab the real route handler behind the string expression
 	*	@return object
 	*	@param $func string
@@ -1514,17 +1579,6 @@ final class Base extends Prefab implements ArrayAccess {
 			// Convert string to executable PHP callback
 			if (!class_exists($parts[1]))
 				user_error(sprintf(self::E_Class,$parts[1]),E_USER_ERROR);
-			if ($this->hive['PSEUDO'] &&
-				$this->hive['VERB']=='POST' &&
-				strtolower($parts[3])=='post' &&
-				preg_match('/!(put|delete)/',
-					implode(',',array_keys($_GET)),$hook) &&
-				method_exists($parts[1],$parts[3])) {
-				// ReST implementation for non-capable HTTP clients
-				$this->hive['BODY']=http_build_query($_POST);
-				$this->hive['VERB']=$parts[3];
-				$parts[3]=$hook[1];
-			}
 			if ($parts[2]=='->') {
 				if (is_subclass_of($parts[1],'Prefab'))
 					$parts[1]=call_user_func($parts[1].'::instance');
@@ -1638,8 +1692,12 @@ final class Base extends Prefab implements ArrayAccess {
 		if ($matches) {
 			$sec='globals';
 			foreach ($matches as $match) {
-				if ($match['section'])
+				if ($match['section']) {
 					$sec=$match['section'];
+					if (preg_match('/^(?!(?:global|config|route|map|redirect)s\b)'.
+						'((?:\.?\w)+)/i',$sec,$msec) && !$this->exists($msec[0]))
+						$this->set($msec[0],NULL);
+				}
 				else {
 					if ($allow) {
 						$match['lval']=Preview::instance()->
@@ -2036,7 +2094,7 @@ final class Base extends Prefab implements ArrayAccess {
 			'PLUGINS'=>$this->fixslashes(__DIR__).'/',
 			'PORT'=>$port,
 			'PREFIX'=>NULL,
-			'PSEUDO'=>FALSE,
+			'PREMAP'=>'',
 			'QUERY'=>isset($uri['query'])?$uri['query']:'',
 			'QUIET'=>FALSE,
 			'RAW'=>FALSE,
@@ -2433,7 +2491,7 @@ class View extends Prefab {
 				if (isset($_COOKIE[session_name()]))
 					@session_start();
 				$fw->sync('SESSION');
-				if ($mime && PHP_SAPI!='cli')
+				if ($mime && PHP_SAPI!='cli' && !headers_sent())
 					header('Content-Type: '.$mime.'; '.
 						'charset='.$fw->get('ENCODING'));
 				$data=$this->sandbox($hive);
@@ -2556,7 +2614,7 @@ class Preview extends View {
 				if (isset($_COOKIE[session_name()]))
 					@session_start();
 				$fw->sync('SESSION');
-				if ($mime && PHP_SAPI!='cli')
+				if ($mime && PHP_SAPI!='cli' && !headers_sent())
 					header('Content-Type: '.($this->mime=$mime).'; '.
 						'charset='.$fw->get('ENCODING'));
 				$data=$this->sandbox($hive);
