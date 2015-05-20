@@ -7,19 +7,15 @@ RewriteEngine On
 #
 # RewriteBase /
 
-RewriteCond %{REQUEST_URI} /app/data/*.
-RewriteRule .* index.php [L,QSA]
+RewriteCond %{HTTP_HOST} ^www\.
+RewriteCond %{HTTPS}s ^on(s)|off
+RewriteCond http%1://%{HTTP_HOST} ^(https?://)(www\.)?(.+)$
+RewriteRule ^ %1%3%{REQUEST_URI} [R=301,L]
 
-RewriteCond %{REQUEST_URI} /tmp/*.
-RewriteRule .* index.php [L,QSA]
-
-RewriteCond %{REQUEST_URI} \.ini$
-RewriteRule \.ini$ - [R=404]
-
-RewriteCond %{REQUEST_URI} \.html?$
-RewriteRule \.html?$ - [R=404]
+RewriteRule ^(app|dict|ns)\/|\.ini$ - [R=404]
 
 RewriteCond %{REQUEST_FILENAME} !-l
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* index.php [L,QSA,E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteRule .* index.php [L,QSA]
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
