@@ -30,6 +30,9 @@ class Post extends Base {
 			'publish_date' => array(
 				'type' => \DB\SQL\Schema::DT_DATE
 			),
+			'created_at' => array(
+				'type' => \DB\SQL\Schema::DT_DATETIME
+			),
 			'published' => array(
 				'type' => \DB\SQL\Schema::DT_BOOLEAN,
 				'default'=>false,
@@ -105,6 +108,8 @@ class Post extends Base {
 		$f3 = \Base::instance();
 		if(!$this->author)
 			$this->author = $f3->get('BACKEND_USER')->_id;
+
+		$this->touch('created_at');
 		return parent::save();
 	}
 

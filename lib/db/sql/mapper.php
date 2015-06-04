@@ -25,11 +25,6 @@ namespace DB\SQL;
 //! SQL data mapper
 class Mapper extends \DB\Cursor {
 
-	//@{ Error messages
-	const
-		E_Adhoc='Unable to process ad hoc field %s';
-	//@}
-
 	protected
 		//! PDO wrapper
 		$db,
@@ -100,10 +95,11 @@ class Mapper extends \DB\Cursor {
 				$this->fields[$key]['changed']=TRUE;
 			return $this->fields[$key]['value']=$val;
 		}
-		// Parenthesize expression in case it's a subquery
+		// adjust result on existing expressions
 		if (isset($this->adhoc[$key]))
 			$this->adhoc[$key]['value']=$val;
 		else
+			// Parenthesize expression in case it's a subquery
 			$this->adhoc[$key]=array('expr'=>'('.$val.')','value'=>NULL);
 		return $val;
 	}
@@ -194,7 +190,7 @@ class Mapper extends \DB\Cursor {
 
 	/**
 	*	Build query string and execute
-	*	@return array
+	*	@return \DB\SQL\Mapper[]
 	*	@param $fields string
 	*	@param $filter string|array
 	*	@param $options array
@@ -298,7 +294,7 @@ class Mapper extends \DB\Cursor {
 
 	/**
 	*	Return records that match criteria
-	*	@return array
+	*	@return \DB\SQL\Mapper[]
 	*	@param $filter string|array
 	*	@param $options array
 	*	@param $ttl int
@@ -389,9 +385,10 @@ class Mapper extends \DB\Cursor {
 		foreach ($this->fields as $key=>$field)
 			if ($field['pkey'])
 				$pkeys[$key]=$field['previous'];
-		if (isset($this->trigger['beforeinsert']))
+		if (isset($this->trigger['beforeinsert']) &&
 			\Base::instance()->call($this->trigger['beforeinsert'],
-				array($this,$pkeys));
+				array($this,$pkeys))===FALSE)
+			return $this;
 		foreach ($this->fields as $key=>&$field) {
 			if ($field['pkey']) {
 				$field['previous']=$field['value'];
@@ -452,9 +449,10 @@ class Mapper extends \DB\Cursor {
 		foreach ($this->fields as $key=>$field)
 			if ($field['pkey'])
 				$pkeys[$key]=$field['previous'];
-		if (isset($this->trigger['beforeupdate']))
+		if (isset($this->trigger['beforeupdate']) &&
 			\Base::instance()->call($this->trigger['beforeupdate'],
-				array($this,$pkeys));
+				array($this,$pkeys))===FALSE)
+			return $this;
 		foreach ($this->fields as $key=>$field)
 			if ($field['changed']) {
 				$pairs.=($pairs?',':'').$this->db->quotekey($key).'=?';
@@ -518,9 +516,10 @@ class Mapper extends \DB\Cursor {
 			unset($field);
 		}
 		parent::erase();
-		if (isset($this->trigger['beforeerase']))
+		if (isset($this->trigger['beforeerase']) &&
 			\Base::instance()->call($this->trigger['beforeerase'],
-				array($this,$pkeys));
+				array($this,$pkeys))===FALSE)
+			return 0;
 		$out=$this->db->
 			exec('DELETE FROM '.$this->table.' WHERE '.$filter.';',$args);
 		if (isset($this->trigger['aftererase']))

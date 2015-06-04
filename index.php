@@ -117,6 +117,34 @@ if (\Controller\Auth::isLoggedIn()) {
 
 $f3->route('GET /logout', 'Controller\Auth->logout');
 
+$f3->route('GET /test2',function( Base $f3, $params) {
+    header('Content-Type: text;');
+
+    $post = new Model\Post();
+    $tag = new Model\Tag();
+    $author = new Model\User();
+
+//    $post->has('comments.post',array('slug = ?','noch-ein-post'));
+    $post->has('comments.post',array('slug = ?','post-with-no-teaser-text'));
+    $r = $post->find();
+    if ($r)
+   		print_r($r->castAll(2));
+
+
+    // works
+//    $tag->has('post.author',array('name = ?','ikkez'));
+//    print_r($tag->find()->castAll(2));
+
+//    $tag->has('post.comments',array('author_name = ?','alfred'));
+//    print_r($tag->find()->castAll(2));
+//    $author->has('news.author',['name = ?','ikkez']);
+//    $author->has('news.comments',['author_name = ?','alfred']);
+//    $author->has('news',['title = ?','filter test']);
+//    print_r($author->find()->castAll(2));
+
+
+    print_r($f3->DB->log());
+});
 
 // let's cross the finger
 $f3->run();

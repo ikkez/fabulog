@@ -80,12 +80,6 @@ class Session extends Mapper {
 			isset($headers['User-Agent'])?$headers['User-Agent']:'');
 		$this->set('stamp',time());
 		$this->save();
-		if (!$sent) {
-			if (isset($_COOKIE['_']))
-				setcookie('_','',strtotime('-1 year'));
-			call_user_func_array('setcookie',
-				array('_',$csrf)+$fw->get('JAR'));
-		}
 		return TRUE;
 	}
 
@@ -148,8 +142,9 @@ class Session extends Mapper {
 	*	Instantiate class
 	*	@param $db object
 	*	@param $table string
+	*	@param $onsuspect callback
 	**/
-	function __construct(\DB\Mongo $db,$table='sessions') {
+	function __construct(\DB\Mongo $db,$table='sessions',$onsuspect=NULL) {
 		parent::__construct($db,$table);
 		session_set_save_handler(
 			array($this,'open'),
@@ -167,8 +162,12 @@ class Session extends Mapper {
 			($agent=$this->agent()) &&
 			(!isset($headers['User-Agent']) ||
 				$agent!=$headers['User-Agent'])) {
-			session_destroy();
-			$fw->error(403);
+			if (isset($onsuspect))
+				$fw->call($onsuspect,array($this));
+			else {
+				session_destroy();
+				$fw->error(403);
+			}
 		}
 		$csrf=$fw->hash($fw->get('ROOT').$fw->get('BASE')).'.'.
 			$fw->hash(mt_rand());

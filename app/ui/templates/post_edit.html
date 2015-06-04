@@ -10,7 +10,9 @@
     <div class="col-lg-12">
         <form id="post-form" action="admin/post/{{(isset(@PARAMS.id))?'edit/'.@PARAMS.id:'create'}}" method="post" class="form-horizontal" role="form">
             <F3:check if="{{isset(@post) && !empty(@post.author._id)}}">
-                <div class="pull-right">written by: {{ @post.author.name }}</div>
+                <div class="pull-right">written by: {{ @post.author.name }}<br/>
+                    created at: {{ '{0,date}', strtotime(@post.created_at) | format }}
+                </div>
             </F3:check>
             <div class="form-group {{@FLASH->getKey('error.model.post.title')}}">
                 <div class="col-sm-5">
