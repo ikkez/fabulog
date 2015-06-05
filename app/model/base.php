@@ -29,6 +29,8 @@ class Base extends \DB\Cortex {
 					// check unique
 					if (isset($conf['unique']))
 						$valid = \Validation::instance()->unique($self,$val,$field,'error.'.$model.'.'.$field);
+					if (!$valid)
+						break;
 				}
 			}
 			return $valid;
