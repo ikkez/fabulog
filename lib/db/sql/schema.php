@@ -18,7 +18,7 @@
  *  https://github.com/ikkez/F3-Sugar/
  *
  *  @package DB
- *  @version 2.1.1
+ *  @version 2.1.2-dev
  **/
 
 
@@ -1109,6 +1109,9 @@ class Column extends DB_Utils {
         // build query
         $query = $this->db->quotekey($this->name).' '.$type_val.' '.
             ($this->nullable ? 'NULL' : 'NOT NULL');
+        // unify default for booleans
+        if (preg_match('/bool/i', $type_val) && $this->default!==null)
+            $this->default = (int) $this->default;
         // default value
         if ($this->default !== false) {
             $def_cmds = array(
@@ -1120,7 +1123,7 @@ class Column extends DB_Utils {
             if ($this->default === Schema::DF_CURRENT_TIMESTAMP) {
                 // check for right datatpye
                 $stamp_type = $this->findQuery($this->schema->dataTypes['TIMESTAMP']);
-                if ($this->type != 'TIMESTAMP' && // TODO: check that condition
+                if ($this->type != 'TIMESTAMP' &&
                     ($this->passThrough && strtoupper($this->type) != strtoupper($stamp_type))
                 )
                     trigger_error(self::TEXT_CurrentStampDataType);
@@ -1135,7 +1138,7 @@ class Column extends DB_Utils {
             }
             $query .= ' '.$def_cmd;
         }
-        if (!empty($this->after)) {
+        if (!empty($this->after) && $this->table instanceof TableModifier) {
             // `after` feature only works for mysql
             if (preg_match('/mysql/', $this->db->driver())) {
                 $after_cmd = 'AFTER '.$this->db->quotekey($this->after);
@@ -1164,19 +1167,11 @@ class DB_Utils {
      * @param $cmd array
      * @return bool|string
      */
-    protected function findQuery($cmd)
-    {
-        $match = FALSE;
+    protected function findQuery($cmd) {
         foreach ($cmd as $backend => $val)
-            if (preg_match('/'.$backend.'/', $this->db->driver())) {
-                $match = TRUE;
-                break;
-            }
-        if (!$match) {
-            trigger_error(sprintf(self::TEXT_ENGINE_NOT_SUPPORTED, $this->db->driver()));
-            return FALSE;
-        }
-        return $val;
+            if (preg_match('/'.$backend.'/', $this->db->driver()))
+                return $val;
+        trigger_error(sprintf(self::TEXT_ENGINE_NOT_SUPPORTED, $this->db->driver()));
     }
 
     public function __construct(SQL $db) {

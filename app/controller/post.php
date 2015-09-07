@@ -126,7 +126,7 @@ class Post extends Resource {
 
 		$ui = $f3->get('UI');
 		if ($f3->get('text_editor') == 'sommernote') {
-			$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.js');
+			$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.min.js');
 			$f3->set('ASSETS.CSS.fontawesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css');
 			$f3->set('ASSETS.CSS.summernote', $ui.'css/summernote.css');
 			$f3->set('ASSETS.CSS.summernote-bs3', $ui.'css/summernote-bs3.css');

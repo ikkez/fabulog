@@ -59,8 +59,7 @@
                     <label for="input-text">Body Text</label>
                     <F3:switch expr="{{@text_editor}}">
                         <case value="sommernote">
-                            <input type="hidden" name="text" id="input-text"/>
-                            <div id="blog-text">{{isset(@POST.text)?@POST.text:'' | raw }}</div>
+                            <textarea name="text" id="blog-text">{{isset(@POST.text)?@POST.text:'' | raw }}</textarea>
                         </case>
                         <default>
                             <textarea class="form-control" name="text" id="input-text" placeholder="Your Blog Post text" rows="12">

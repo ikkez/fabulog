@@ -35,10 +35,10 @@ $(function () {
     // editor
     if ($('#blog-text').length > 0) {
         $('#blog-text').summernote({
-            height: 450
-        });
-        $('#post-form').on('submit', function () {
-            $('#input-text').val($('#blog-text').code());
+            height: 450,
+            onChange: function(contents, $editable) {
+                $(this).val(contents);
+            }
         });
     }
 
