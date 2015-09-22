@@ -20,7 +20,7 @@ class Base extends \DB\Cortex {
 		$saveHandler = function(\DB\Cortex $self) use($class) {
 			$valid = true;
 			foreach($self->getFieldConfiguration() as $field=>$conf) {
-				if (isset($conf['type'])) {
+				if (isset($conf['type']) && !isset($conf['relType'])) {
 					$val = $self->get($field);
 					$model = strtolower(str_replace('\\','.',$class));
 					// check required fields
