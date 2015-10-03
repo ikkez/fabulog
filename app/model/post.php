@@ -67,7 +67,15 @@ class Post extends Base {
 	 */
 	public function set_title($val) {
 		// auto create slug when setting a blog title
-		$this->set('slug',\Web::instance()->slug($val));
+		$slug = \Web::instance()->slug($val);
+		$i=0;
+		$newslug = $slug;
+		if ($this->dry() || $slug != $this->slug )
+			while ($this->findone(array('slug = ?',$newslug))) {
+				$i++;
+				$newslug = $slug.'-'.$i;
+			}
+		$this->set('slug',$newslug);
 		return $val;
 	}
 
