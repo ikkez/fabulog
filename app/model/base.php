@@ -24,10 +24,10 @@ class Base extends \DB\Cortex {
 					$val = $self->get($field);
 					$model = strtolower(str_replace('\\','.',$class));
 					// check required fields
-					if (isset($conf['required']))
+					if ($valid && isset($conf['required']))
 						$valid = \Validation::instance()->required($val,$field,'error.'.$model.'.'.$field);
 					// check unique
-					if (isset($conf['unique']))
+					if ($valid && isset($conf['unique']))
 						$valid = \Validation::instance()->unique($self,$val,$field,'error.'.$model.'.'.$field);
 					if (!$valid)
 						break;
