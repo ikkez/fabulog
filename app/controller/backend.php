@@ -11,7 +11,7 @@ class Backend extends Base {
 	/**
 	 * init the backend view, so the module controller can care about it
 	 */
-	public function beforeroute() {
+	public function beforeroute($f3) {
 		$module_name = \Base::instance()->get('PARAMS.module');
 		$this->response = new \View\Backend();
 		$this->response->data['LAYOUT'] = $module_name.'_layout.html';

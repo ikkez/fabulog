@@ -116,6 +116,7 @@ class Post extends Resource {
 			// copy whole post model, to be able to fetch relations
 			// on the fly from within the template, if we need them
 			$this->response->data['post']=$this->resource;
+			$f3->set('page.title',$this->resource->title.' - '.\Config::instance()->blog_title);
 		}
 	}
 
@@ -211,7 +212,4 @@ class Post extends Resource {
 		$f3->reroute('/admin/post');
 	}
 
-	public function beforeroute() {
-		$this->response = new \View\Frontend();
-	}
 } 

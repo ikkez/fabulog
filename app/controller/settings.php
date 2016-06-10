@@ -6,7 +6,7 @@ namespace Controller;
 class Settings extends Base {
 
 
-	public function beforeroute() {
+	public function beforeroute($f3) {
 		$this->response = new \View\Backend();
 		$this->response->data['LAYOUT'] = 'settings_layout.html';
 	}

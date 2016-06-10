@@ -11,7 +11,7 @@ class Auth extends Base {
     /**
      * init the View
      */
-    public function beforeroute() {
+    public function beforeroute($f3) {
         $this->response = new \View\Backend();
     }
 

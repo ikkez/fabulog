@@ -9,7 +9,7 @@ class Comment extends Resource {
 		parent::__construct($mapper);
 	}
 
-	public function beforeroute() {
+	public function beforeroute($f3) {
 		$this->response = new \View\Backend();
 		$this->response->data['LAYOUT'] = 'comment_layout.html';
 	}
