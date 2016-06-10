@@ -39,6 +39,9 @@ class User extends Base {
      * @return string
      */
     public function set_password($val) {
+        // only change password when a value was given
+        if (!$val)
+            return $this->password;
         $f3 = \Base::instance();
         $hash_engine = $f3->get('password_hash_engine');
         switch($hash_engine) {
