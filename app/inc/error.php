@@ -30,8 +30,11 @@ class Error {
 		}
 		elseif ($f3->get('ERROR.code') == 500) {
 			$f3->set('headline', 'Internal Server Error');
-				if ($f3->get('DEV'))
+				if ($f3->get('DEV')) {
 					$f3->set('trace',$f3->highlight($f3->get('ERROR.trace')));
+					if ($f3->exists('DB'))
+						$f3->set('db_log',nl2br($f3->get('DB')->log()));
+				}
 			@mail($f3->get('error_mail'),'Fabulog Error',$f3->get('ERROR.text')."\n\n".$f3->get('ERROR.trace'));
 		}
 		$f3->set('LAYOUT', 'error.html');

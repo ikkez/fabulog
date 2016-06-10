@@ -13,14 +13,14 @@
  *              |  |    < |    <|  -__|-- __|
  *              |__|__|__||__|__|_____|_____|
  *
- *  Copyright (c) 2014 by ikkez
- *  Christian Knuth <ikkez0n3@gmail.com>
+ *  Copyright (c) 2016 by ikkez
+ *  Christian Knuth <mail@ikkez.de>
  *  https://github.com/ikkez/F3-Sugar/
  *
  *  @package DB
- *  @version 1.4.1-dev
+ *  @version 1.4.2-dev
+ *  @date 29.01.2016
  *  @since 24.04.2012
- *  @date 04.06.2015
  */
 
 namespace DB;
@@ -173,7 +173,9 @@ class Cortex extends Cursor {
 					list($key, $relField) = explode('.',$val,2);
 					$this->relWhitelist[$key][(int)$exclude][] = $relField;
 					unset($fields[$i]);
+					$fields[] = $key;
 				}
+		$fields = array_unique($fields);
 		$schema = $this->whitelist ?: $this->mapper->fields();
 		if (!$schema && !$this->dbsType != 'sql' && $this->dry()) {
 			$schema = $this->load()->mapper->fields();
@@ -673,13 +675,13 @@ class Cortex extends Cursor {
 								$hasJoin = array_merge($hasJoin,
 									$this->_hasJoinMM_sql($key,$hasCond,$filter,$options));
 								$options['group'] = (isset($options['group'])?$options['group'].',':'').
-									$this->db->quotekey($this->table.'.'.$this->primary);
+									$this->table.'.'.$this->primary;
 								$groupFields = explode(',', preg_replace('/"/','',$options['group']));
 								// all non-aggregated fields need to be present in the GROUP BY clause
 								if (isset($m_refl_adhoc) && preg_match('/sybase|dblib|odbc|sqlsrv/i',$this->db->driver()))
 									foreach (array_diff($this->mapper->fields(),array_keys($m_refl_adhoc)) as $field)
 										if (!in_array($this->table.'.'.$field,$groupFields))
-											$options['group'] .= ', '.$this->db->quotekey($this->table.'.'.$field);
+											$options['group'] .= ', '.$this->table.'.'.$field;
 							}
 							elseif ($result = $this->_hasRefsInMM($key,$has_filter,$has_options,$ttl))
 								$addToFilter = array($id.' IN ?', $result);
@@ -712,14 +714,14 @@ class Cortex extends Cursor {
 						$filter[0] .= ' and ';
 					$cond = array_shift($addToFilter);
 					if ($this->dbsType=='sql')
-						$cond = $this->_sql_quoteCondition($cond,$this->db->quotekey($this->table));
+						$cond = $this->_sql_prependTableToFields($cond,$this->table);
 					$filter[0] .= '('.$cond.')';
 					$filter = array_merge($filter, $addToFilter);
 				}
 			}
 			$this->hasCond = null;
 		}
-		$filter = $this->queryParser->prepareFilter($filter,$this->dbsType,$this->fieldConf);
+		$filter = $this->queryParser->prepareFilter($filter, $this->dbsType, $this->db, $this->fieldConf);
 		if ($this->dbsType=='sql') {
 			$qtable = $this->db->quotekey($this->table);
 			if (isset($options['order']) && $this->db->driver() == 'pgsql')
@@ -743,8 +745,11 @@ class Cortex extends Cursor {
 				}
 				$sql .= ' '.implode(' ',$hasJoin).' WHERE '.$filter[0];
 				if (!$count) {
+					$db=$this->db;
 					if (isset($options['group']))
-						$sql .= ' GROUP BY '.$this->_sql_quoteCondition($options['group'], $this->table);
+						$sql.=' GROUP BY '.preg_replace_callback('/\w+[._-\w]*/i', function($match) use($db) {
+								return $db->quotekey($match[0]);
+							}, $options['group']);
 					if (isset($options['order']))
 						$sql .= ' ORDER BY '.$options['order'];
 					if (preg_match('/mssql|sqlsrv|odbc/', $this->db->driver()) &&
@@ -955,15 +960,13 @@ class Cortex extends Cursor {
 	 */
 	protected function _sql_mergeRelCondition($cond, $table, &$filter, &$options)
 	{
-		$table = $this->db->quotekey($table);
 		if (!empty($cond[0])) {
 			$whereClause = '('.array_shift($cond[0]).')';
-			$whereClause = $this->_sql_quoteCondition($whereClause,$table);
+			$whereClause = $this->_sql_prependTableToFields($whereClause,$table);
 			if (!$filter)
 				$filter = array($whereClause);
 			elseif (!empty($filter[0]))
-				$filter[0] = '('.$this->_sql_quoteCondition($filter[0],
-					$this->db->quotekey($this->table)).') and '.$whereClause;
+				$filter[0] = '('.$this->_sql_prependTableToFields($filter[0],$this->table).') and '.$whereClause;
 			$filter = array_merge($filter, $cond[0]);
 		}
 		if ($cond[1] && isset($cond[1]['group'])) {
@@ -972,16 +975,22 @@ class Cortex extends Cursor {
 		}
 	}
 
-	protected function _sql_quoteCondition($cond, $table)
-	{
-		$db = $this->db;
-		if (preg_match('/[`\'"\[\]]/i',$cond))
-			return $cond;
-		return preg_replace_callback('/\w+/i',function($match) use($table,$db) {
-			if (preg_match('/\b(AND|OR|IN|LIKE|NOT)\b/i',$match[0]))
-				return $match[0];
-			return $table.'.'.$db->quotekey($match[0]);
-		}, $cond);
+	/**
+	 * add table prefix to identifiers
+	 * @param string $cond
+	 * @param string $table
+	 * @return string
+	 */
+	protected function _sql_prependTableToFields($cond, $table) {
+		 return preg_replace_callback('/(\w+\((?:[^)(]+|(?R))*\))|'.
+			 '(?:(\s)|^|(?<=[_(]))([a-zA-Z_](?:[\w\-_]+))(?=[\s<>=!)]|$)/i',
+			function($match) use($table) {
+				if (!isset($match[3]))
+					return $match[1];
+				if (preg_match('/\b(AND|OR|IN|LIKE|NOT)\b/i',$match[3]))
+					return $match[0];
+				return $match[2].$table.'.'.$match[3];
+			}, $cond);
 	}
 
 	/**
@@ -1025,12 +1034,27 @@ class Cortex extends Cursor {
 	{
 		if (array_key_exists($key, $this->relFilter) &&
 			!empty($this->relFilter[$key][0]))
-		{
-			$filter = $this->relFilter[$key][0];
-			$crit[0] .= ' and '.array_shift($filter);
-			$crit = array_merge($crit, $filter);
-		}
+			$crit=$this->mergeFilter(array($this->relFilter[$key][0],$crit));
 		return $crit;
+	}
+
+	/**
+	 * merge multiple filters
+	 * @param array $filters
+	 * @param string $glue
+	 * @return array
+	 */
+	public function mergeFilter($filters,$glue='and') {
+		$crit = array();
+		$params = array();
+		if ($filters) {
+			foreach($filters as $filter) {
+				$crit[] = array_shift($filter);
+				$params = array_merge($params,$filter);
+			}
+			array_unshift($params,'( '.implode(' ) '.$glue.' ( ',$crit).' )');
+		}
+		return $params;
 	}
 
 	/**
@@ -1052,7 +1076,7 @@ class Cortex extends Cursor {
 	 */
 	public function erase($filter = null)
 	{
-		$filter = $this->queryParser->prepareFilter($filter, $this->dbsType);
+		$filter = $this->queryParser->prepareFilter($filter, $this->dbsType, $this->db);
 		if (!$filter) {
 			if ($this->emit('beforeerase')===false)
 				return false;
@@ -1076,6 +1100,14 @@ class Cortex extends Cursor {
 	 **/
 	function save()
 	{
+		// update changed collections
+		$fields = $this->fieldConf;
+		if ($fields)
+			foreach($fields as $key=>$conf)
+				if (!empty($this->fieldsCache[$key]) && $this->fieldsCache[$key] instanceof CortexCollection
+					&& $this->fieldsCache[$key]->hasChanged())
+					$this->set($key,$this->fieldsCache[$key]->getAll('_id',true));
+		// perform event & save operations
 		if ($new = $this->dry()) {
 			if ($this->emit('beforeinsert')===false)
 				return false;
@@ -1085,14 +1117,6 @@ class Cortex extends Cursor {
 				return false;
 			$result=$this->update();
 		}
-		// update changed collections
-		$fields = $this->fieldConf;
-		if ($fields)
-			foreach($fields as $key=>$conf)
-				if (!empty($this->fieldsCache[$key]) && $this->fieldsCache[$key] instanceof CortexCollection
-					&& $this->fieldsCache[$key]->hasChanged())
-					$this->set($key,$this->fieldsCache[$key]->getAll('_id',true));
-
 		// m:m save cascade
 		if (!empty($this->saveCsd)) {
 			foreach($this->saveCsd as $key => $val) {
@@ -1172,8 +1196,8 @@ class Cortex extends Cursor {
 					// many-to-many
 					if ($this->dbsType == 'sql') {
 						$mmTable = $this->mmTable($relConf,$key);
-						$filter = array($this->db->quotekey($mmTable).'.'.$this->db->quotekey($relConf['relField'])
-							.' = '.$this->db->quotekey($this->table).'.'.$this->db->quotekey($this->primary));
+						$filter = array($this->db->quotekey($mmTable.'.'.$relConf['relField'])
+							.' = '.$this->db->quotekey($this->table.'.'.$this->primary));
 						$from=$mmTable;
 						if (array_key_exists($key, $this->relFilter) &&
 							!empty($this->relFilter[$key][0])) {
@@ -1182,7 +1206,7 @@ class Cortex extends Cursor {
 							$relFilter = $this->relFilter[$key];
 							$this->_sql_mergeRelCondition($relFilter,$relConf['relTable'],$filter,$options);
 						}
-						$filter = $this->queryParser->prepareFilter($filter,$this->dbsType,$this->fieldConf);
+						$filter = $this->queryParser->prepareFilter($filter, $this->dbsType, $this->db, $this->fieldConf);
 						$crit = array_shift($filter);
 						if (count($filter)>0)
 							$this->preBinds+=$filter;
@@ -1203,7 +1227,7 @@ class Cortex extends Cursor {
 						$table=$this->db->quotekey($this->table);
 						$crit = $fTable.'.'.$rKey.' = '.$table.'.'.$pKey;
 						$filter = $this->mergeWithRelFilter($key,array($crit));
-						$filter = $this->queryParser->prepareFilter($filter,$this->dbsType,$this->fieldConf);
+						$filter = $this->queryParser->prepareFilter($filter, $this->dbsType, $this->db, $this->fieldConf);
 						$crit = array_shift($filter);
 						if (count($filter)>0)
 							$this->preBinds+=$filter;
@@ -1500,7 +1524,8 @@ class Cortex extends Cursor {
 					trigger_error(sprintf(self::E_REL_CONF_INC, $key));
 				$rel = $this->getRelInstance($fromConf[0],null,$key,true);
 				$relFieldConf = $rel->getFieldConfiguration();
-				$relType = key($relFieldConf[$fromConf[1]]);
+				$relType = isset($relFieldConf[$fromConf[1]]['belongs-to-one']) ?
+					'belongs-to-one' : 'has-many';
 				// one-to-*, bidirectional, inverse way
 				if ($relType == 'belongs-to-one') {
 					$toConf = $relFieldConf[$fromConf[1]]['belongs-to-one'];
@@ -1815,7 +1840,7 @@ class Cortex extends Cursor {
 					$rd = isset($rel_depths[$key]) ? $rel_depths[$key] : $rel_depths['*'];
 					if ((is_array($rd) || $rd >= 0) && $type=preg_grep('/[belongs|has]-(to-)*[one|many]/',
 							array_keys($this->fieldConf[$key]))) {
-						$relType=$type[0];
+						$relType=current($type);
 						// cast relations
 						$val = (($relType == 'belongs-to-one' || $relType == 'belongs-to-many')
 							&& !$mp->exists($key)) ? NULL : $mp->get($key);
@@ -2033,10 +2058,6 @@ class Cortex extends Cursor {
 		return $this->mapper->dbtype();
 	}
 
-	public function __destruct() {
-		unset($this->mapper);
-	}
-
 	public function __clone() {
 		$this->mapper = clone($this->mapper);
 	}
@@ -2071,16 +2092,19 @@ class CortexQueryParser extends \Prefab {
 	 *
 	 * @param array $cond
 	 * @param string $engine
+	 * @param object $db
 	 * @param null $fieldConf
 	 * @return array|bool|null
 	 */
-	public function prepareFilter($cond, $engine,$fieldConf=null)
+	public function prepareFilter($cond, $engine, $db, $fieldConf=null)
 	{
 		if (is_null($cond)) return $cond;
 		if (is_string($cond))
 			$cond = array($cond);
 		$f3 = \Base::instance();
 		$cacheHash = $f3->hash($f3->stringify($cond)).'.'.$engine;
+		if ($engine=='sql')
+			$cacheHash.='-'.$db->driver();
 		if (isset($this->queryCache[$cacheHash]))
 			// load from memory
 			return $this->queryCache[$cacheHash];
@@ -2114,8 +2138,12 @@ class CortexQueryParser extends \Prefab {
 				$ncond = $this->_mongo_parse_logical_op($parts);
 				break;
 			case 'sql':
+				if (!$f3->exists('CORTEX.quoteConditions',$qc) || $qc)
+					$where = $this->sql_quoteCondition($where,$db);
 				// preserve identifier
 				$where = preg_replace('/(?!\B)_id/', 'id', $where);
+				if ($db->driver() == 'pgsql')
+					$where = preg_replace('/\s+like\s+/i', ' ILIKE ', $where);
 				$parts = $this->splitLogical($where);
 				// ensure positional bind params
 				if (is_int(strpos($where, ':')))
@@ -2131,15 +2159,18 @@ class CortexQueryParser extends \Prefab {
 							$bindMarks = str_repeat('?,', count($val) - 1).'?';
 							$part = substr($part, 0, $pos).'IN ('.$bindMarks.')';
 							$ncond = array_merge($ncond, $val);
+						} elseif($val === null && preg_match('/(\w+)\s*([!=<>]+)\s*\?/i',$part,$match)) {
+							$part = $match[1].' IS '.($match[2]=='='||$match[2]=='=='?'':'NOT ').'NULL';
 						} else
 							$ncond[] = $val;
 					}
 					unset($part);
 				}
-				array_unshift($ncond, array_reduce($parts,function($out,$part){
-					return $out.((!$out||in_array($part,array('(',')'))
-						||preg_match('/\($/',$out))?'':' ').$part;
-				},''));
+				array_unshift($ncond, implode($parts));
+//				array_unshift($ncond, array_reduce($parts,function($out,$part){
+//					return $out.((!$out||in_array($part,array('(',')'))
+//						||preg_match('/\($/',$out))?'':' ').$part;
+//				},''));
 				break;
 			default:
 				trigger_error(self::E_ENGINEERROR);
@@ -2160,7 +2191,7 @@ class CortexQueryParser extends \Prefab {
 	 */
 	protected function splitLogical($cond)
 	{
-		return preg_split('/\s*((?<!\()\)|\((?!\))|\bAND\b|\bOR\b)\s*/i', $cond, -1,
+		return preg_split('/(\s*(?<!\()\)|\w*\((?!\))|\bAND\b|\bOR\b\s*)/i', $cond, -1,
 			PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 	}
 
@@ -2190,6 +2221,29 @@ class CortexQueryParser extends \Prefab {
 	}
 
 	/**
+	 * quote identifiers in condition
+	 * @param string $cond
+	 * @param object $db
+	 * @param string|bool $table
+	 * @return string
+	 */
+	public function sql_quoteCondition($cond, $db, $table=false) {
+//		if (preg_match('/[`\'"\[\]]/i',$cond))
+//			return $cond;
+		// https://www.debuggex.com/r/6AXwJ1Y3Aac8aocQ/3
+		// https://regex101.com/r/yM5vK4/1
+		return preg_replace_callback('/(\w+\((?:[^)(]+|(?R))*\))|'.
+			'(?:(\b[a-zA-Z_](?:[\w\-_.]+\.?))(?=[\s<>=!)]|$))/i',
+			function($match) use($table,$db) {
+				if (!isset($match[2]))
+					return $match[1];
+				if (preg_match('/\b(AND|OR|IN|LIKE|NOT)\b/i',$match[2]))
+					return $match[2];
+				return $db->quotekey(($table?$table.'.':'').$match[2]);
+			}, $cond);
+	}
+
+	/**
 	 * convert filter array to jig syntax
 	 * @param $where
 	 * @param $args
@@ -2202,7 +2256,7 @@ class CortexQueryParser extends \Prefab {
 			list($parts, $args) = $this->convertNamedParams($parts, $args);
 		$ncond = array();
 		foreach ($parts as &$part) {
-			if (in_array(strtoupper($part), array('AND', 'OR')))
+			if (preg_match('/\s*\b(AND|OR)\b\s*/i',$part))
 				continue;
 			// prefix field names
 			$part = preg_replace('/([a-z_-]+)/i', '@$1', $part, -1, $count);
@@ -2210,6 +2264,7 @@ class CortexQueryParser extends \Prefab {
 			if (is_int(strpos($part, '?'))) {
 				$val = array_shift($args);
 				preg_match('/(@\w+)/i', $part, $match);
+				$skipVal=false;
 				// find like operator
 				if (is_int(strpos($upart = strtoupper($part), ' @LIKE '))) {
 					if ($not = is_int($npos = strpos($upart, '@NOT')))
@@ -2217,16 +2272,24 @@ class CortexQueryParser extends \Prefab {
 					$val = $this->_likeValueToRegEx($val);
 					$part = ($not ? '!' : '').'preg_match(?,'.$match[0].')';
 				} // find IN operator
-				else if (is_int($pos = strpos($upart, ' @IN '))) {
+				elseif (is_int($pos = strpos($upart, ' @IN '))) {
 					if ($not = is_int($npos = strpos($upart, '@NOT')))
 						$pos = $npos;
 					$part = ($not ? '!' : '').'in_array('.substr($part, 0, $pos).
 						',array(\''.implode('\',\'', $val).'\'))';
-					unset($val);
+					$skipVal=true;
+				}
+				elseif($val===null && preg_match('/(\w+)\s*([!=<>]+)\s*\?/i',$part,$nmatch)
+					&& ($nmatch[2]=='=' || $nmatch[2]=='==')){
+					$part = '(!array_key_exists(\''.ltrim($nmatch[1],'@').'\',$_row))';
+					unset($part);
+					continue;
 				}
 				// add existence check
-				$part = '(isset('.$match[0].') && '.$part.')';
-				if (isset($val))
+				$part = ($val===null && !$skipVal)
+					? '(array_key_exists(\''.ltrim($match[0],'@').'\',$_row) && '.$part.')'
+					: '(isset('.$match[0].') && '.$part.')';
+				if (!$skipVal)
 					$ncond[] = $val;
 			} elseif ($count >= 1) {
 				// field comparison
@@ -2275,9 +2338,9 @@ class CortexQueryParser extends \Prefab {
 				$child[] = $part;
 			// condition type
 			elseif (!is_array($part)) {
-				if (strtoupper($part) == 'AND')
+				if (strtoupper(trim($part)) == 'AND')
 					$add = true;
-				elseif (strtoupper($part) == 'OR')
+				elseif (strtoupper(trim($part)) == 'OR')
 					$or = true;
 			} else // skip
 				$ncond[] = $part;
@@ -2355,14 +2418,14 @@ class CortexQueryParser extends \Prefab {
 		$lC = substr($var, -1, 1);
 		// %var% -> /var/
 		if ($var[0] == '%' && $lC == '%')
-			$var = '/'.substr($var, 1, -1).'/';
+			$var = substr($var, 1, -1);
 		// var%  -> /^var/
 		elseif ($lC == '%')
-			$var = '/^'.substr($var, 0, -1).'/';
+			$var = '^'.substr($var, 0, -1);
 		// %var  -> /var$/
 		elseif ($var[0] == '%')
-			$var = '/'.substr($var, 1).'$/';
-		return $var;
+			$var = substr($var, 1).'$';
+		return '/'.$var.'/iu';
 	}
 
 	/**
@@ -2521,11 +2584,12 @@ class CortexCollection extends \ArrayIterator {
 	{
 		$out = array();
 		foreach ($this->getArrayCopy() as $model) {
-			if ($model->exists($prop,true)) {
+			if ($model instanceof Cortex && $model->exists($prop,true)) {
 				$val = $model->get($prop, $raw);
 				if (!empty($val))
 					$out[] = $val;
-			}
+			} elseif($raw)
+				$out[] = $model;
 		}
 		return $out;
 	}
