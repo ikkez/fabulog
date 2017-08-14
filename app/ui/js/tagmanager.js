@@ -493,7 +493,7 @@
         }
       } else if (tagManagerOptions.output != null) {
         if (jQuery(tagManagerOptions.output) && jQuery(tagManagerOptions.output).val())
-        var existing_tags = jQuery(tagManagerOptions.output)
+        var existing_tags = jQuery(tagManagerOptions.output);
         prefill(jQuery(tagManagerOptions.output).val().split(baseDelimiter));
       }
     });

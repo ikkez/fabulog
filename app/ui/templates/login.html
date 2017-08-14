@@ -4,15 +4,10 @@
     <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
     <meta charset="{{@$ENCODING}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{@UI}}ico/favicon.png">
+    <link rel="shortcut icon" href="ico/favicon.png">
     <title>{{@CONFIG.blog_title}} - fabulog backend</title>
-    <link href="{{@UI}}css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{@UI}}css/backend.css" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="{{@UI}}js/vendor/html5shiv.js"></script>
-    <script src="{{@UI}}js/vendor/respond.min.js"></script>
-    <![endif]-->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/backend.css" rel="stylesheet">
 </head>
 
 <body>
@@ -43,20 +38,9 @@
             </div>
 </div>
 
-<script src="{{@UI}}js/vendor/jquery.js"></script>
-<script src="{{@UI}}js/vendor/bootstrap.min.js"></script>
-<script src="{{@UI}}js/jq_borderflow.js"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-
-        $('.borderflow').borderFlow({borderWidth: 8});
-        $('#login-submit').click(function () {
-            $('#login-box').data('borderFlow').playSimple({duration:10000});
-        });
-
-    });
-
-
-</script>
+<script src="js/vendor/jquery.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script src="js/jq_borderflow.js"></script>
+<script src="js/login.js"></script>
 </body>
 </html>

@@ -48,7 +48,7 @@ class Post extends Resource {
 
 			$this->resource->filter('comments', array('approved = ?',1));
 			$this->resource->countRel('comments');
-			$records = $this->resource->paginate($page-1,10,
+			$records = $this->resource->paginate($page-1,5,
 				array('publish_date <= ? and published = ?', date('Y-m-d'), true),
 				array('order' => 'publish_date desc'));
 		}
@@ -127,10 +127,10 @@ class Post extends Resource {
 
 		$ui = $f3->get('UI');
 		if ($f3->get('text_editor') == 'sommernote') {
-			$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.min.js');
-			$f3->set('ASSETS.CSS.fontawesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css');
-			$f3->set('ASSETS.CSS.summernote', $ui.'css/summernote.css');
-			$f3->set('ASSETS.CSS.summernote-bs3', $ui.'css/summernote-bs3.css');
+//			$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.min.js');
+//			$f3->set('ASSETS.CSS.fontawesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css');
+//			$f3->set('ASSETS.CSS.summernote', $ui.'css/summernote.css');
+//			$f3->set('ASSETS.CSS.summernote-bs3', $ui.'css/summernote-bs3.css');
 		}
 
 		$f3->set('ASSETS.JS.jqueryui', $ui.'js/vendor/jquery.ui.widget.js');

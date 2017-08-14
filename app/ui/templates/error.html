@@ -8,7 +8,7 @@
         </div>
         <div class="panel-body">
             {{ @text }}
-            <F3:check if="{{ @trace }}">
+            <F3:check if="{{ isset(@trace) }}">
                 <hr/>
                 <div class="error-trace well">{{ @trace }}</div>
             </F3:check>

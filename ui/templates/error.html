@@ -7,11 +7,11 @@
         </div>
         <div class="panel-body">
             {{ @text }}
-            <F3:check if="{{ @trace }}">
+            <F3:check if="{{ isset(@trace) }}">
                 <hr/>
                 <div class="error-trace well">{{ @trace }}</div>
             </F3:check>
-            <F3:check if="{{ @db_log }}">
+            <F3:check if="{{ isset(@db_log) }}">
                 <hr/>
                 <div class="well">{{ @db_log }}</div>
             </F3:check>

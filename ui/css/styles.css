@@ -1,11 +1,5 @@
-@import url("//fonts.googleapis.com/css?family=Open+Sans:400,700");
-
-*, body, p, h1,h2,h3,h4,h5,h6,input,textarea,select {
-    font-family: 'Open Sans', sans-serif;
-}
 
 body {
-  /*padding-top: 80px;*/
     background-color: #ddd;
 }
 
@@ -19,6 +13,10 @@ body {
 #hero {
     background: url("../images/diagmonds.png") 0 0 repeat;
     color: #fff;
+}
+
+#hero .container {
+    max-width: 860px;
 }
 
 #main {

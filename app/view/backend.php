@@ -12,6 +12,9 @@ class Backend extends Base {
 		$f3 = \Base::instance();
 		// change UI path to backend layout dir
 		$f3->copy('BACKEND_UI','UI');
+
+		$f3->set('ASSETS.filter.js','combine');
+
 		// save last visited URL
 		if ($f3->exists('SESSION.CurrentPageURL')) {
 			if ($f3->get('SESSION.CurrentPageURL') != $f3->get('PARAMS.0'))

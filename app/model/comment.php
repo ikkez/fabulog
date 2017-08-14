@@ -46,7 +46,7 @@ class Comment extends Base {
 
     static public function countNew() {
         $comments = new self;
-        return $comments->count(array('approved = ?',0));
+        return $comments->count(array('approved = ?',0),null,0);
     }
 
 }

@@ -4,24 +4,13 @@
     <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
     <meta charset="{{@ENCODING}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{@UI}}ico/favicon.png">
+    <link rel="shortcut icon" href="ico/favicon.png">
     <title>fabulog backend - {{@CONFIG.blog_title}}</title>
-    <link href="{{@UI}}css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{@UI}}css/font-awesome.min.css" rel="stylesheet">
-    <link href="{{@UI}}css/datepicker.css" rel="stylesheet">
-    <link href="{{@UI}}css/tagmanager.css" rel="stylesheet">
-    <link href="{{@UI}}css/backend.css" rel="stylesheet">
-
-    <F3:check if="{{ isset(@ASSETS.CSS) }}">
-    <F3:repeat group="{{ @ASSETS.CSS }}" value="{{ @path }}">
-    <link href="{{@path}}" rel="stylesheet">
-    </F3:repeat>
-    </F3:check>
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="{{@UI}}js/vendor/html5shiv.js"></script>
-    <script src="{{@UI}}js/vendor/respond.min.js"></script>
-    <![endif]-->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/datepicker.css" rel="stylesheet">
+    <link href="css/tagmanager.css" rel="stylesheet">
+    <link href="css/backend.css" rel="stylesheet">
 </head>
 
 <body>
@@ -84,18 +73,11 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="{{@UI}}js/vendor/jquery.js"></script>
-<script src="{{@UI}}js/vendor/bootstrap.min.js"></script>
-<script src="{{@UI}}js/bootstrap-datepicker.js"></script>
-<script src="{{@UI}}js/typeahead.min.js"></script>
-<script src="{{@UI}}js/tagmanager.js"></script>
-
-<F3:check if="{{ isset(@ASSETS.JS) }}">
-<F3:repeat group="{{ @ASSETS.JS }}" value="{{ @path }}">
-<script src="{{ @path }}"></script>
-</F3:repeat>
-</F3:check>
-
-<script src="{{@UI}}js/app.js"></script>
+<script src="js/vendor/jquery.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script src="js/bootstrap-datepicker.js"></script>
+<script src="js/typeahead.min.js"></script>
+<script src="js/tagmanager.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

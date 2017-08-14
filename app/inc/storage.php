@@ -14,7 +14,7 @@
 		@date: 31.10.13
  **/
 
-class storage extends Prefab {
+class Storage extends Prefab {
 
 	public function get($type) {
 		$cfg = Config::instance();

@@ -1,0 +1,19 @@
+{
+    "name": "ikkez/fabulog",
+    "description": "Your fabulous blogware",
+    "type": "project",
+    "require": {
+        "bcosca/fatfree-core": "^3.6",
+        "ikkez/f3-cortex": "dev-master",
+        "ikkez/f3-flash": "^1.0",
+        "ikkez/f3-assets": "^1.0",
+        "ikkez/f3-pagination": "^1.4"
+    },
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "ikkez",
+            "email": "mail@ikkez.de"
+        }
+    ]
+}
