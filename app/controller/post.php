@@ -125,19 +125,6 @@ class Post extends Resource {
 		$f3 = \Base::instance();
 		$this->response->data['SUBPART'] = 'post_edit.html';
 
-		$ui = $f3->get('UI');
-		if ($f3->get('text_editor') == 'sommernote') {
-//			$f3->set('ASSETS.JS.summernote', $ui.'js/summernote.min.js');
-//			$f3->set('ASSETS.CSS.fontawesome', '//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css');
-//			$f3->set('ASSETS.CSS.summernote', $ui.'css/summernote.css');
-//			$f3->set('ASSETS.CSS.summernote-bs3', $ui.'css/summernote-bs3.css');
-		}
-
-		$f3->set('ASSETS.JS.jqueryui', $ui.'js/vendor/jquery.ui.widget.js');
-		$f3->set('ASSETS.JS.jq-iframe-transport', $ui.'js/jquery.iframe-transport.js');
-		$f3->set('ASSETS.JS.fileupload', $ui.'js/jquery.fileupload.js');
-		$f3->set('ASSETS.CSS.fileupload', $ui.'css/jquery.fileupload.css');
-
 		$f3->set('DP_FORMAT', $f3->get('LANGUAGE') == 'de-DE' ? 'dd.mm.yyyy' : 'mm/dd/yy');
 	}
 
