@@ -29,6 +29,7 @@ class Setup extends \Prefab {
 			$f3->UPLOADS,
 			'res/',
 			'app/data/',
+			$f3->get('ASSETS.public_path'),
 		];
 
 		$preErr = [];
