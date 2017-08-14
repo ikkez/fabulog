@@ -14,6 +14,16 @@ body {
     background: url("../images/diagmonds.png") 0 0 repeat;
     color: #fff;
 }
+.navbar-inverse {
+    border: none;
+    border-bottom: 1px solid #e95420;
+}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+    background-color: #e95420;
+}
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+    background-color: #6a280d;
+}
 
 #hero .container {
     max-width: 860px;
