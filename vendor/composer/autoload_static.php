@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit3ba3246540cbb59d0258d47af08a3d03
+class ComposerStaticInit7b19ee07188ecd5433b9837cfb80e84c
 {
     public static $classMap = array (
         'Assets' => __DIR__ . '/..' . '/ikkez/f3-assets/lib/assets.php',
@@ -65,7 +65,7 @@ class ComposerStaticInit3ba3246540cbb59d0258d47af08a3d03
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit3ba3246540cbb59d0258d47af08a3d03::$classMap;
+            $loader->classMap = ComposerStaticInit7b19ee07188ecd5433b9837cfb80e84c::$classMap;
 
         }, null, ClassLoader::class);
     }

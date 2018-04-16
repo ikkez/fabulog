@@ -1,5 +1,5 @@
 <h2>Post list</h2>
-
+<p>total: {{ @content.total }}</p>
 <F3:pagebrowser items="{{@content.total}}" src="templates/pagebrowser.html" limit="{{@content.limit}}" token-prefix="p-"/>
 
 <F3:repeat group="{{ @content.subset }}" value="{{ @item }}">

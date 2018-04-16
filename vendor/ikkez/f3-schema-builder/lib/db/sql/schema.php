@@ -13,21 +13,21 @@
  *              |  |    < |    <|  -__|-- __|
  *              |__|__|__||__|__|_____|_____|
  *
- *  Copyright (c) 2016 by ikkez
+ *  Copyright (c) 2012-2018 by ikkez
  *  Christian Knuth <ikkez0n3@gmail.com>
  *  https://github.com/ikkez/F3-Sugar/
  *
  *  @package DB
- *  @version 2.2.1
- *  @date 25.04.2017
+ *  @version 2.2.2
+ *  @date 06.03.2018
  **/
 
 
 namespace DB\SQL;
 
-use DB\SQL;
+class Schema {
 
-class Schema extends DB_Utils {
+    use DB_Utils;
 
     public
         $dataTypes = array(
@@ -112,9 +112,6 @@ class Schema extends DB_Utils {
     public static
         $strict = FALSE;
 
-    /** @var \Base */
-    protected $fw;
-
     const
         // DataTypes and Aliases
         DT_BOOL = 'BOOLEAN',
@@ -147,8 +144,7 @@ class Schema extends DB_Utils {
 
     public function __construct(\DB\SQL $db)
     {
-        $this->fw = \Base::instance();
-        parent::__construct($db);
+        $this->db = $db;
     }
 
     /**
@@ -304,7 +300,9 @@ class Schema extends DB_Utils {
     }
 }
 
-abstract class TableBuilder extends DB_Utils {
+abstract class TableBuilder {
+
+	use DB_Utils;
 
     protected   $columns, $pkeys, $queries, $increments, $rebuild_cmd, $suppress;
     public      $name;
@@ -318,7 +316,6 @@ abstract class TableBuilder extends DB_Utils {
     /**
      * @param string $name
      * @param Schema $schema
-     * @return \DB\SQL\TableBuilder
      */
     public function __construct($name, Schema $schema)
     {
@@ -328,7 +325,7 @@ abstract class TableBuilder extends DB_Utils {
         $this->queries = array();
         $this->pkeys = array('id');
         $this->increments = 'id';
-        parent::__construct($schema->db);
+        $this->db = $schema->db;
     }
 
     /**
@@ -549,6 +546,8 @@ class TableModifier extends TableBuilder {
     /**
      * generate SQL queries for altering the table and execute it if $exec is true,
      * otherwise return the generated query string
+     * @param bool $exec
+     * @return array|FALSE
      */
     public function build($exec = TRUE)
     {
@@ -763,9 +762,9 @@ class TableModifier extends TableBuilder {
         else
             foreach ($schema as $name => &$cols) {
                 $default = ($cols['default'] === '') ? null : $cols['default'];
-                if (!is_null($default) && (
-                    (is_int(strpos($curdef=$this->findQuery($this->schema->defaultTypes['CUR_STAMP']),
-                    $default)) || is_int(strpos($default,$curdef)))
+                if (!is_null($default) && ((is_int(strpos($curdef=strtolower(
+                    $this->findQuery($this->schema->defaultTypes['CUR_STAMP'])),
+                    strtolower($default))) || is_int(strpos(strtolower($default),$curdef)))
                     || $default == "('now'::text)::timestamp(0) without time zone"))
                 {
                     $default = 'CUR_STAMP';
@@ -874,7 +873,6 @@ class TableModifier extends TableBuilder {
      * @param string $name
      * @param string|Column $datatype
      * @param bool $force
-     * @return bool
      */
     public function updateColumn($name, $datatype, $force = false)
     {
@@ -1031,7 +1029,9 @@ class TableModifier extends TableBuilder {
  * Class Column
  * @package DB\SQL
  */
-class Column extends DB_Utils {
+class Column {
+
+    use DB_Utils;
 
     public      $name, $type, $nullable, $default, $after, $index, $unique, $passThrough, $pkey;
     protected   $table, $schema, $type_val;
@@ -1056,7 +1056,7 @@ class Column extends DB_Utils {
 
         $this->table = $table;
         $this->schema = $table->schema;
-        parent::__construct($this->schema->db);
+        $this->db = $this->schema->db;
     }
 
     /**
@@ -1281,22 +1281,16 @@ class Column extends DB_Utils {
                 constant('\PDO::PARAM_'.strtoupper($parts[0])) : \PDO::PARAM_STR;
             return ($this->default === NULL ? 'NULL' :
                 $this->db->quote(htmlspecialchars($this->default, ENT_QUOTES,
-                    $this->f3->get('ENCODING')), $pdo_type));
+                    \Base::instance()->get('ENCODING')), $pdo_type));
         }
     }
 }
 
 
-class DB_Utils {
+trait DB_Utils {
 
     /** @var \DB\SQL */
-    protected $db;
-
-    /** @var \BASE */
-    protected $f3;
-
-    const
-        TEXT_ENGINE_NOT_SUPPORTED = 'DB Engine `%s` is not supported for this action.';
+    public $db;
 
     /**
      * parse command array and return backend specific query
@@ -1308,11 +1302,6 @@ class DB_Utils {
         foreach ($cmd as $backend => $val)
             if (preg_match('/'.$backend.'/', $this->db->driver()))
                 return $val;
-        trigger_error(sprintf(self::TEXT_ENGINE_NOT_SUPPORTED, $this->db->driver()),E_USER_ERROR);
-    }
-
-    public function __construct(SQL $db) {
-        $this->db = $db;
-        $this->f3 = \Base::instance();
+        trigger_error(sprintf('DB Engine `%s` is not supported for this action.', $this->db->driver()),E_USER_ERROR);
     }
 }

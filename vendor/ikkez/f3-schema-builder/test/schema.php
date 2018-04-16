@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace Test;
 
-class Schema extends Controller
+class Schema extends \App\Controller
 {
 
     private
@@ -12,6 +12,13 @@ class Schema extends Controller
         $f3,
         $test,
         $tname;
+
+	static function init() {
+		/** @var \Base $f3 */
+		$f3 = \Base::instance();
+		$f3->menu['/schema'] = 'SQL Schema Builder';
+		$f3->map('/schema','Test\Schema');
+	}
 
     private function getTime()
     {
@@ -37,13 +44,13 @@ class Schema extends Controller
             'mysql' => new \DB\SQL(
                 'mysql:host=localhost;port=3306;dbname=fatfree', 'fatfree', ''
             ),
-            'sqlite' => new \DB\SQL(
-                'sqlite::memory:'
+//            'sqlite' => new \DB\SQL(
+//                'sqlite::memory:'
 //             'sqlite:db/sqlite.db'
-            ),
-            'pgsql' => new \DB\SQL(
-                'pgsql:host=localhost;dbname=fatfree', 'fatfree', 'fatfree'
-            ),
+//            ),
+//            'pgsql' => new \DB\SQL(
+//                'pgsql:host=localhost;dbname=fatfree', 'fatfree', 'fatfree'
+//            ),
 //            'sqlsrv2012' => new \DB\SQL(
 //                'sqlsrv:SERVER=LOCALHOST\SQLEXPRESS2012;Database=fatfree','fatfree', 'fatfree'
 //            ),
@@ -465,6 +472,7 @@ class Schema extends Controller
         $mapper->title2 = 'foobar';
         $mapper->title_notnull = 'bar';
         $mapper->save();
+        $mapper->reset();
 
         $result = array_map(array($mapper,'cast'),$mapper->find());
 

@@ -23,7 +23,7 @@ require('vendor/autoload.php');
 /** @var \Base $f3 */
 $f3 = \Base::instance();
 
-$f3->set('APP_VERSION', '0.3.0');
+$f3->set('APP_VERSION', '0.3.1');
 $f3->BITMASK = ENT_COMPAT|ENT_SUBSTITUTE;
 
 //ini_set('display_errors', 1);
@@ -66,5 +66,13 @@ $f3->config('app/routes.ini');
 if (\Controller\Auth::isLoggedIn()) {
 	$f3->config('app/routes_admin.ini');
 }
+
+$f3->route('GET /test',function( Base $f3, $params) {
+	// create demo admin user
+	$user = new \Model\User();
+	$user->load(array('username = ?', 'admin'));
+	$f3->error(500);
+});
+
 
 $f3->run();

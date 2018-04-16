@@ -8,10 +8,10 @@
     compliance with the license. Any of the license terms and conditions
     can be waived if you get permission from the copyright holder.
 
-    Copyright (c) 2012-2016 by ikkez
+    Copyright (c) 2012-2017 by ikkez
     Christian Knuth <mail@ikkez.de>
 
-    @version 1.4.3
+    @version 1.4.4
  **/
 
 class Pagination {
@@ -28,6 +28,7 @@ class Pagination {
 
     const
         TEXT_MissingItemsAttr='You need to specify items attribute for a pagination.';
+
     /**
      * create new pagination
      * @param $items array|integer max items or array to count

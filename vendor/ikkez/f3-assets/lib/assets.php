@@ -7,11 +7,11 @@
  *	compliance with the license. Any of the license terms and conditions
  *	can be waived if you get permission from the copyright holder.
  *
- *	Copyright (c) 2016 ~ ikkez
+ *	Copyright (c) 2018 ~ ikkez
  *	Christian Knuth <ikkez0n3@gmail.com>
  *
- *	@version: 1.0.0
- *	@date: 08.11.2016
+ *	@version: 1.1.4
+ *	@date: 18.03.2018
  *	@since: 08.08.2014
  *
  **/
@@ -57,6 +57,8 @@ class Assets extends Prefab {
 				'exclude'=>'.*(.min.).*',
 				'inline'=>false,
 			),
+			'fixRelativePaths'=>'relative',
+			'trim_public_root'=>false,
 			'handle_inline'=>false,
 			'timestamps'=>false,
 			'onFileNotFound'=>null,
@@ -205,6 +207,12 @@ class Assets extends Prefab {
 	 */
 	public function renderGroup($assets) {
 		$out = array();
+		if ($this->f3->get('ASSETS.trim_public_root')) {
+			$basePath=$this->f3->fixslashes(realpath($this->f3->fixslashes(
+				$_SERVER['DOCUMENT_ROOT'].$this->f3->get('BASE'))));
+			$cDir=getcwd();
+			$trimPublicDir=str_replace($cDir,'',$basePath);
+		}
 		foreach($assets as $asset_type=>$collection) {
 			if ($this->f3->exists('ASSETS.filter.'.$asset_type,$filters)) {
 				if (is_string($filters))
@@ -220,6 +228,8 @@ class Assets extends Prefab {
 						&& is_file($path)) ? '?'.filemtime($path) : '';
 					$base = ($this->f3->get('ASSETS.prepend_base') && $asset['origin']!='external'
 						&& is_file($path)) ? $this->f3->get('BASE').'/': '';
+					if (isset($trimPublicDir) && $asset['origin']!='external')
+						$path = substr($path,strlen($trimPublicDir));
 					$asset['path'] = $base.$path.$mtime;
 				}
 				$out[]=$this->f3->call($this->formatter[$asset_type],array($asset));
@@ -269,17 +279,21 @@ class Assets extends Prefab {
 				$slots[$sn[$a_slot?:'internal']][] = $asset;
 			} else
 				// excluded internal
-				$slots[$sn[$a_slot?:'excluded']][] = $asset;
+				$slots[$sn['excluded']][] = $asset;
 		}
 		// proceed slots
 		ksort($slots);
 		$out = array();
-		foreach ($slots as $assets) {
+		foreach ($slots as $slotID => $assets) {
 			$internal=array();
 			$inline=array();
 			$hash_key=array();
 			// categorize per slot
 			foreach ($assets as $asset) {
+				if ($slotID == $sn['excluded']) {
+					$out[] = $asset;
+					continue;
+				}
 				if ($asset['origin']=='internal') {
 					$internal[$asset['type']][] = $asset;
 					// check if one of our combined files was changed (mtime)
@@ -304,7 +318,7 @@ class Assets extends Prefab {
 							$data = $this->f3->read($asset['path']);
 							if ($type=='css')
 								$data = $this->fixRelativePaths($data,
-									pathinfo($asset['path'],PATHINFO_DIRNAME).'/');
+									pathinfo($asset['path'],PATHINFO_DIRNAME).'/',$public_path);
 							$content[] = $data;
 						}
 						$this->f3->write($filepath,
@@ -371,7 +385,7 @@ class Assets extends Prefab {
 						$path_parts['dirname'].'/');
 					if ($type=='css')
 						$min = $this->fixRelativePaths($min,
-							$path_parts['dirname'].'/');
+							$path_parts['dirname'].'/',$public_path);
 					$this->f3->write($public_path.$filename,$min);
 				}
 				$asset['path'] = $public_path.$filename;
@@ -415,27 +429,68 @@ class Assets extends Prefab {
 	 * @author Bong Cosca, from F3 v2.0.13, http://bit.ly/1Mwl7nq
 	 * @param string $content
 	 * @param string $path
+	 * @param string $targetDir
 	 * @return string
 	 */
-	protected function fixRelativePaths($content,$path) {
+	public function fixRelativePaths($content,$path,$targetDir=null) {
 		// Rewrite relative URLs in CSS
 		$f3=$this->f3;
-		$base=$f3->get('BASE');
-		$out = preg_replace_callback(
-			'/\b(?<=url)\((?:([\"\']?)(.+?)((\?.*?)?)\1)\)/s',
-			function($url) use($path,$f3,$base) {
-				// Ignore absolute URLs
-				if (preg_match('/https?:/',$url[2]) ||
-					!$rPath=realpath($path.$url[2]))
+		$method=$f3->get('ASSETS.fixRelativePaths');
+		if ($method!==FALSE) {
+			$webBase=$f3->get('BASE');
+			// fix base path (resolve symbolic links)
+			$basePath=$f3->fixslashes(realpath(
+				$f3->fixslashes($_SERVER['DOCUMENT_ROOT'].$webBase)).DIRECTORY_SEPARATOR);
+			// parse content for URLs
+			$content=preg_replace_callback(
+				'/\b(?<=url)\((?:([\"\']?)(.+?)((\?.*?)?)\1)\)/s',
+				function($url) use ($path,$f3,$webBase,$basePath,$targetDir,$method) {
+					// Ignore absolute URLs
+					if (preg_match('/https?:/',$url[2]) ||
+						!$rPath=realpath($path.$url[2]))
+						return $url[0];
+					if ($method=='relative') {
+						// relative from new public file path
+						$filePathFromBase=str_replace($basePath,'',$f3->fixslashes($rPath));
+						$rel=$this->relPath($targetDir,$filePathFromBase);
+						return '('.$url[1].$rel.(isset($url[4])?$url[4]:'').$url[1].')';
+					} elseif ($method=='absolute') {
+						// absolute to web root / base
+						return '('.$url[1].preg_replace(
+								'/'.preg_quote($basePath,'/').'(.+)/',
+								'\1',$webBase.'/'.$f3->fixslashes($rPath).(isset($url[4])?$url[4]:'')
+							).$url[1].')';
+					}
 					return $url[0];
-				// absolute to web root / base
-				// TODO: maybe build full relative paths?
-				return '('.$url[1].preg_replace(
-					'/'.preg_quote($f3->fixslashes($_SERVER['DOCUMENT_ROOT']).$base.'/','/').'(.+)/',
-					'\1',$base.'/'.$f3->fixslashes($rPath).(isset($url[4])?$url[4]:'')
-				).$url[1].')';
-			},$content);
-		return $out;
+				},$content);
+		}
+		return $content;
+	}
+
+	/**
+	 * assemble relative path to go from A to B
+	 * @param $from
+	 * @param $to
+	 * @return string
+	 */
+	public function relPath($from,$to) {
+		$expFrom = explode('/',$from);
+		$expTo = explode('/',$to);
+		$max=max(count($expFrom),count($expTo));
+		$rel = [];
+		$base=TRUE;
+		for ($i=0;$i<$max;$i++) {
+			if ($base && isset($expTo[$i]) && isset($expFrom[$i])
+				&& $expTo[$i] === $expFrom[$i])
+				continue;
+			else
+				$base=FALSE;
+			if (!empty($expFrom[$i]))
+				array_unshift($rel,'..');
+			if (!empty($expTo[$i]))
+				array_push($rel,$expTo[$i]);
+		}
+		return implode('/',$rel);
 	}
 
 	/**
@@ -455,8 +510,7 @@ class Assets extends Prefab {
 		$asset = array(
 			'path'=>$path,
 			'type'=>$type,
-			'slot'=>$slot,
-			'origin'=>''
+			'slot'=>$slot
 		) + ($params?:array());
 		if (preg_match('/^(http(s)?:)?\/\/.*/i',$path)) {
 			$asset['origin'] = 'external';
@@ -473,6 +527,8 @@ class Assets extends Prefab {
 		// file not found
 		if ($handler=$this->f3->get('ASSETS.onFileNotFound'))
 			$this->f3->call($handler,array($path,$this));
+		// mark unknown file as external
+		$asset['origin'] = 'external';
 		$this->assets[$group][$type][$priority][]=$asset;
 	}
 
@@ -595,7 +651,8 @@ class Assets extends Prefab {
 				$params['slot'] = 'inline';
 			if ($this->f3->get('ASSETS.handle_inline'))
 				return '<?php \Assets::instance()->addInline('.
-				'$this->resolve('.(var_export($node,true)).',get_defined_vars()),'.
+				'$this->resolve('.(var_export($node,true)).
+					',get_defined_vars(),0,false,false),'.
 				var_export($params['type'],true).','.
 				var_export($params['group'],true).','.
 				var_export($params['slot'],true).'); ?>';
