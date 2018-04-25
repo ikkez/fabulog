@@ -32,7 +32,7 @@
     <F3:check if="{{ (isset(@post.enable_comments) && @post.enable_comments == 1) || !isset(@post.enable_comments) }}">
     <aside>
         <section id="comment-list">
-            <h3>Comments ({{ count(@post.comments) }})</h3>
+            <h3>Comments ({{ count(@post.comments?:[]) }})</h3>
             <check if="{{ @post.comments }}">
             <true>
                 <repeat group="{{ @post.comments }}" value="{{ @comment }}">

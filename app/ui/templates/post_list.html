@@ -64,7 +64,7 @@
                             <i class="glyphicon glyphicon-eye-close"></i> hidden</span>
                     </false>
                 </check>
-                <span><i class="glyphicon glyphicon-comment"></i> {{count(@item.comments)}}</span>
+                <span><i class="glyphicon glyphicon-comment"></i> {{count(@item.comments?:[])}}</span>
         </div>
     </div>
 </F3:repeat>
