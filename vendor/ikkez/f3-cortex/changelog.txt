@@ -1,0 +1,130 @@
+CHANGELOG - Cortex ORM
+
+1.5.1 (25.04.2018)
+*	new: Cortex->getMapper to access the raw mapper
+*	added has-many <> belongs-to-one inverse save handler, which was not implemented before
+*	clear virtual fields on reset
+*	improved mongodb support
+*	apply auto-quoting to order statement, if not already quoted, #60
+*	reset internal schema cache upon setup
+*	fix Jig sorting issue on camelCase fields
+*	fix unit test for php7.2
+*	fix field matching for jig filter
+*	fix changed field check for `_id` field
+*	fix custom primary key with m:m relation usage, #56
+*	fix issue with certain whitespace in filters for mongodb
+*	fix countRel mm-table quotation
+*	fix jig order issue on count
+
+1.5.0 (30.06.2017)
+*	F3 3.6.2 compatibility fixes
+*	new: Collection->contains method
+*	new: Collection->compare method
+*	allow a CortexCollection to be used as bind parameter for `IN` operators
+*	allow to optionally set a table $charset
+*	improved field whitelisting, #23 #24
+*	include virtual fields in whitelist, #48
+*	reduced schema queries
+*	optimized table and field escaping in queries #46
+*	use aliased table on join conditions
+*	use class ttl defaults if any
+*	added getRaw shortcut method
+*	added space after `IN` group in query condition
+*	added isSelf configuration existence check
+*	Bug fix: issue with NULL-value as named bind parameter
+*	Bug fix: table prefix on NULL comparison
+*	Bug fix: invalid bind value on multiple rel counts
+
+1.4.3 (01.03.2017)
+*	Bug fix: fix NULL bind value issue, #40
+*	Bug fix: fix NULL comparison, #40
+
+1.4.2 (27.02.2017)
+*	new: self-referencing m:m relations
+*	new: support for NULL filter bind values (like `array('foo != ?',null)`)
+*	raised error level (from NOTICE to USER_ERROR)
+*	extended datetime recognition in fluid mode
+*	refactored m:m reference clearing, #34
+*	align primary key setter
+*	use mapper setter for countRel fields
+*	escape fields names in where conditions, #21
+*	Bug fix: empty belongs-to-many relation, #35
+*	Bug fix: countRel on m:1 with custom foreign keys
+*	Bug fix: touch() method data type detection
+*	Bug fix: regex character set on group by
+*	Bug fix: case-insensitive LIKE search in postgre
+
+1.4.1 (29.01.2016)
+*	new: mergeFilter method, #7
+*	fix column rel type recognition, #13
+*	fix id assignments on collections, #8
+*	fix relation updates on changed collections, #8
+*	fix NULL filter arguments for Jig, #6
+*	keep case-insensitivity for Jig & Mongo, #5
+*	add return to erase method, #3
+*	Bug fix: missing relation fields when whitelist is active
+*	Bug fix: sql expressions in queries
+*	Bug fix: drop obsolete has-many fields on setup
+*	Bug fix: table detection
+
+1.4.0 (04.06.2015)
+*	experimental: nested has() propagation
+*	new: nested filter() propagation (dot-style chaining)
+*	new: composer support
+*	new: touch() method to update date, datetime and timestamp fields
+*	new: rel() method returns a new mapper of the given relation type
+*	new: fine-grained option array for casting relations
+*	refactored collection storage, uses references now
+*	use a normal INT, not BIGINT, as default for foreign keys
+*	allow custom local field on mm table
+*	Bug fix: erase collections with $filter
+*	Bug fix: getting m:m collections from dry mappers
+*	Bug fix: return dereferenced collections on loading a subset
+*	Bug fix: consider fieldConfig for new fluid fields
+*	add new many-many relation with short array push syntax
+*	and some more small fixes
+
+1.3.0 (19.01.2015)
+*	improved count() behaviour
+*	MS SQL Server fixes
+*	refactor grouping and virtual fields with F3 v3.4
+*	clean up pivot table on deleting items with mm-relations
+*	added support for the cursor event handlers
+*	compatibility fixes for F3 v3.3.1 (ArrayAccess by Reference)
+*	Bug fix: type-casting to int and bool in MongoDB
+*	Bug fix: consider has-filter on count() method, #40
+*	Bug fix: has-filter used wrong column on sql many-to-many
+*	added possibility to add own virtual fields
+*	renamed countResults() to loaded() to follow fatfree #581 syntax
+*	Feature: countRel() to add a counter for related records
+*	advanced MongoId recognition/conversion in filter query
+*	added orderBy method to collection, for subsequent sorting
+*	unified sorting of NULL values in postgreSQL
+*	compatibility fixed for MongoDB 2.6.x
+*	and a lot of other small fixes and improvements
+
+1.2.0 (02.04.2014)
+*	added whitelisting of own and related fields
+*	added $option parameter to filter() method
+*	support for custom primary fields in SQL
+*	Bug fix: belongs-to-one linkage with non-primary fields
+*	Bug fix: don't split DB functions in where condition 
+*	Bug fix: postgreSQL GROUP BY clause
+*	compatibility fixes for F3 v.3.2.2
+*	added NOT LIKE operator to query parser
+
+1.1.0 (09.01.2014)
+*	Feature: has-filter
+*	allow case sensitive table names
+*	addRelFilter renamed to filter
+*	enhanced copyfrom
+*	compatibility fixes for F3 v3.2.1
+*	move castAll into CortexCollection
+*	add castField function
+*	add inverse has-one relations
+*	use case-sensitive table names
+*	Bug fix: casting many-many relations
+*	Bug fix: Jig filter bind value
+
+1.0.0 (30.11.2013)
+*	init commit
