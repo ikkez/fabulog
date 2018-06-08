@@ -1,23 +1,23 @@
 [
     {
         "name": "bcosca/fatfree-core",
-        "version": "3.6.3",
-        "version_normalized": "3.6.3.0",
+        "version": "3.6.4",
+        "version_normalized": "3.6.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/bcosca/fatfree-core.git",
-            "reference": "b35fe7ae88f6f3667c50c36563b50e5a1ec36bb1"
+            "reference": "4d1a08829b14468c4821c03b9a5f3b6e4bc981e5"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/bcosca/fatfree-core/zipball/b35fe7ae88f6f3667c50c36563b50e5a1ec36bb1",
-            "reference": "b35fe7ae88f6f3667c50c36563b50e5a1ec36bb1",
+            "url": "https://api.github.com/repos/bcosca/fatfree-core/zipball/4d1a08829b14468c4821c03b9a5f3b6e4bc981e5",
+            "reference": "4d1a08829b14468c4821c03b9a5f3b6e4bc981e5",
             "shasum": ""
         },
         "require": {
             "php": ">=5.4"
         },
-        "time": "2017-12-31T14:47:39+00:00",
+        "time": "2018-04-19T17:35:23+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -34,20 +34,20 @@
     },
     {
         "name": "ikkez/f3-assets",
-        "version": "v1.1.4",
-        "version_normalized": "1.1.4.0",
+        "version": "v1.1.5",
+        "version_normalized": "1.1.5.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-assets.git",
-            "reference": "c96fcf3288c6e4833607ca09f3bd3521ce19c4d9"
+            "reference": "77189fb6270897c38e41a7e66cf703f56446d8d0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/c96fcf3288c6e4833607ca09f3bd3521ce19c4d9",
-            "reference": "c96fcf3288c6e4833607ca09f3bd3521ce19c4d9",
+            "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/77189fb6270897c38e41a7e66cf703f56446d8d0",
+            "reference": "77189fb6270897c38e41a7e66cf703f56446d8d0",
             "shasum": ""
         },
-        "time": "2018-03-18T14:47:35+00:00",
+        "time": "2018-05-08T12:11:55+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -76,18 +76,18 @@
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-cortex.git",
-            "reference": "05ccecb201e6dc624418a4b12f54d549ce5a1bc7"
+            "reference": "269c80a635cad9eebe612a6710b6037b651265cd"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/05ccecb201e6dc624418a4b12f54d549ce5a1bc7",
-            "reference": "05ccecb201e6dc624418a4b12f54d549ce5a1bc7",
+            "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/269c80a635cad9eebe612a6710b6037b651265cd",
+            "reference": "269c80a635cad9eebe612a6710b6037b651265cd",
             "shasum": ""
         },
         "require": {
             "ikkez/f3-schema-builder": "2.*"
         },
-        "time": "2018-02-22T13:53:24+00:00",
+        "time": "2018-05-18T15:17:57+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -189,20 +189,20 @@
     },
     {
         "name": "ikkez/f3-schema-builder",
-        "version": "v2.2.2",
-        "version_normalized": "2.2.2.0",
+        "version": "v2.2.3",
+        "version_normalized": "2.2.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-schema-builder.git",
-            "reference": "f829a91944ab8c6f142b08d71447b356bb943a0b"
+            "reference": "42d8f3f0a117dce29ab3fe30ef46fafb419224e3"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-schema-builder/zipball/f829a91944ab8c6f142b08d71447b356bb943a0b",
-            "reference": "f829a91944ab8c6f142b08d71447b356bb943a0b",
+            "url": "https://api.github.com/repos/ikkez/f3-schema-builder/zipball/42d8f3f0a117dce29ab3fe30ef46fafb419224e3",
+            "reference": "42d8f3f0a117dce29ab3fe30ef46fafb419224e3",
             "shasum": ""
         },
-        "time": "2018-03-06T13:27:23+00:00",
+        "time": "2018-05-15T13:03:21+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

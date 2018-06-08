@@ -10,8 +10,8 @@
  *	Copyright (c) 2018 ~ ikkez
  *	Christian Knuth <ikkez0n3@gmail.com>
  *
- *	@version: 1.1.4
- *	@date: 18.03.2018
+ *	@version: 1.1.5
+ *	@date: 08.05.2018
  *	@since: 08.08.2014
  *
  **/
@@ -36,6 +36,9 @@ class Assets extends Prefab {
 	public function __construct() {
 		$this->template = \Template::instance();
 		$f3 = $this->f3 = \Base::instance();
+		$minifyComplier = function($fileName,$path) {
+			return \Web::instance()->minify($fileName,null,false,$path);
+		};
 		$opt_defaults = array(
 			'auto_include'=>true,
 			'greedy'=>false,
@@ -44,6 +47,7 @@ class Assets extends Prefab {
 			'combine'=>array(
 				'public_path'=>'',
 				'exclude'=>'',
+				'merge_attributes'=>false,
 				'slots'=>array(
 					10=>'top',
 					20=>'external',
@@ -56,6 +60,10 @@ class Assets extends Prefab {
 				'public_path'=>'',
 				'exclude'=>'.*(.min.).*',
 				'inline'=>false,
+				'compiler'=>[
+					'js'=>$minifyComplier,
+					'css'=>$minifyComplier,
+				]
 			),
 			'fixRelativePaths'=>'relative',
 			'trim_public_root'=>false,
@@ -324,11 +332,17 @@ class Assets extends Prefab {
 						$this->f3->write($filepath,
 							implode(($type=='js'?';':'')."\n",$content));
 					}
+					$extra_attr=[];
+					if ($this->f3->get('ASSETS.combine.merge_attributes'))
+						foreach($int_a as $asset)
+							$extra_attr+=array_diff_key($asset, array_flip([
+								'path','origin','type','exclude'
+							]));
 					$out[] = array(
 						'path'=>$filepath,
 						'type'=>$type,
 						'origin'=>'internal'
-					);
+					)+$extra_attr;
 				}
 			}
 			// combine inline
@@ -351,7 +365,6 @@ class Assets extends Prefab {
 	 * @return mixed
 	 */
 	public function minify($collection) {
-		$web = \Web::instance();
 		// check final path
 		$public_path = $this->f3->get('ASSETS.minify.public_path');
 		if (!is_dir($public_path))
@@ -378,11 +391,12 @@ class Assets extends Prefab {
 				(empty($exclude) || !preg_match('/'.$exclude.'/i',$path)))) {
 				// proceed
 				$path_parts = pathinfo($path);
-				$filename = $path_parts['filename'].'.min.'.$type;
+				$filename = $path_parts['filename'].'.'
+					.substr($this->f3->hash($path),0,5).'.min.'.$type;
 				if (!is_file($public_path.$filename) ||
 					(filemtime($path)>filemtime($public_path.$filename))) {
-					$min = $web->minify($path_parts['basename'],null,false,
-						$path_parts['dirname'].'/');
+					$min = $this->f3->call($this->f3->get('ASSETS.minify.compiler.'.$type),
+						[$path_parts['basename'],$path_parts['dirname'].'/']);
 					if ($type=='css')
 						$min = $this->fixRelativePaths($min,
 							$path_parts['dirname'].'/',$public_path);
