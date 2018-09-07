@@ -45,7 +45,7 @@ final class Base extends Prefab implements ArrayAccess {
 	//@{ Framework details
 	const
 		PACKAGE='Fat-Free Framework',
-		VERSION='3.6.4-Release';
+		VERSION='3.6.5-Dev';
 	//@}
 
 	//@{ HTTP status codes (RFC 2616)
@@ -890,8 +890,14 @@ final class Base extends Prefab implements ArrayAccess {
 					return $expr[0];
 				if (isset($type)) {
 					if (isset($this->hive['FORMATS'][$type]))
-						return $this->call($this->hive['FORMATS'][$type],
-							[$args[$pos],isset($mod)?$mod:null,isset($prop)?$prop:null]);
+						return $this->call(
+							$this->hive['FORMATS'][$type],
+							[
+								$args[$pos],
+								isset($mod)?$mod:null,
+								isset($prop)?$prop:null
+							]
+						);
 					switch ($type) {
 						case 'plural':
 							preg_match_all('/(?<tag>\w+)'.
@@ -964,16 +970,20 @@ final class Base extends Prefab implements ArrayAccess {
 											$args[$pos]*100,0,$decimal_point,
 											$thousands_sep).'%';
 								}
+							$frac=$args[$pos]-(int)$args[$pos];
 							return number_format(
-								$args[$pos],isset($prop)?$prop:2,
+								$args[$pos],
+								isset($prop)?
+									$prop:
+									$frac?strlen($frac)-2:0,
 								$decimal_point,$thousands_sep);
 						case 'date':
+							$prop='%A, %d %B %Y';
 							if (empty($mod) || $mod=='short')
 								$prop='%x';
-							elseif ($mod=='long')
-								$prop='%A, %d %B %Y';
 							return strftime($prop,$args[$pos]);
 						case 'time':
+							$prop='%r';
 							if (empty($mod) || $mod=='short')
 								$prop='%X';
 							return strftime($prop,$args[$pos]);
@@ -1244,7 +1254,8 @@ final class Base extends Prefab implements ArrayAccess {
 		if (!is_array($loggable))
 			$loggable=$this->split($loggable);
 		foreach ($loggable as $status)
-			if ($status=='*' || preg_match('/^'.preg_replace('/\D/','\d',$status).'$/',$code)) {
+			if ($status=='*' ||
+				preg_match('/^'.preg_replace('/\D/','\d',$status).'$/',$code)) {
 				error_log($text);
 				foreach (explode("\n",$trace) as $nexus)
 					if ($nexus)
@@ -1270,7 +1281,14 @@ final class Base extends Prefab implements ArrayAccess {
 				'beforeroute,afterroute')===FALSE) &&
 			!$prior && !$this->hive['CLI'] && !$this->hive['QUIET'])
 			echo $this->hive['AJAX']?
-				json_encode(array_diff_key($this->hive['ERROR'],$this->hive['DEBUG']?[]:['trace'=>1])):
+				json_encode(
+					array_diff_key(
+						$this->hive['ERROR'],
+						$this->hive['DEBUG']?
+							[]:
+							['trace'=>1]
+					)
+				):
 				('<!DOCTYPE html>'.$eol.
 				'<html>'.$eol.
 				'<head>'.
@@ -1733,7 +1751,9 @@ final class Base extends Prefab implements ArrayAccess {
 	}
 
 	/**
-	*	Disconnect HTTP client
+	*	Disconnect HTTP client;
+	*	Set FcgidOutputBufferSize to zero if server uses mod_fcgid;
+	*	Disable mod_deflate when rendering text/html output
 	**/
 	function abort() {
 		if (!headers_sent() && session_status()!=PHP_SESSION_ACTIVE)
@@ -1741,9 +1761,10 @@ final class Base extends Prefab implements ArrayAccess {
 		$out='';
 		while (ob_get_level())
 			$out=ob_get_clean().$out;
-		header('Content-Encoding: none');
-		header('Content-Length: '.strlen($out));
-		header('Connection: close');
+		if (!headers_sent()) {
+			header('Content-Length: '.strlen($out));
+			header('Connection: close');
+		}
 		session_commit();
 		echo $out;
 		flush();
@@ -1771,11 +1792,13 @@ final class Base extends Prefab implements ArrayAccess {
 						$parts[1]=call_user_func([$container,'get'],$parts[1]);
 					elseif (is_callable($container))
 						$parts[1]=call_user_func($container,$parts[1],$args);
-					elseif (is_string($container) && is_subclass_of($container,'Prefab'))
-						$parts[1]=call_user_func($container.'::instance')->get($parts[1]);
+					elseif (is_string($container) &&
+						is_subclass_of($container,'Prefab'))
+						$parts[1]=call_user_func($container.'::instance')->
+							get($parts[1]);
 					else
 						user_error(sprintf(self::E_Class,
-							$this->stringify($container)),
+							$this->stringify($parts[1])),
 							E_USER_ERROR);
 				}
 				else {
@@ -1916,7 +1939,8 @@ final class Base extends Prefab implements ArrayAccess {
 						call_user_func_array(
 							[$this,$cmd[1]],
 							array_merge([$match['lval']],
-								str_getcsv($cmd[1]=='config'?$this->cast($match['rval']):
+								str_getcsv($cmd[1]=='config'?
+								$this->cast($match['rval']):
 									$match['rval']))
 						);
 					}
@@ -1931,9 +1955,11 @@ final class Base extends Prefab implements ArrayAccess {
 						$args=array_map(
 							function($val) {
 								$val=$this->cast($val);
-								return is_string($val)
-									? preg_replace('/\\\\"/','"',$val)
-									: $val;
+								if (is_string($val))
+									$val=strlen($val)?
+										preg_replace('/\\\\"/','"',$val):
+										NULL;
+								return $val;
 							},
 							// Mark quoted strings with 0x00 whitespace
 							str_getcsv(preg_replace(
@@ -2221,6 +2247,7 @@ final class Base extends Prefab implements ArrayAccess {
 		);
 		if (!isset($_SERVER['SERVER_NAME']) || $_SERVER['SERVER_NAME']==='')
 			$_SERVER['SERVER_NAME']=gethostname();
+		$headers=[];
 		if ($cli=PHP_SAPI=='cli') {
 			// Emulate HTTP request
 			$_SERVER['REQUEST_METHOD']='GET';
@@ -2251,33 +2278,30 @@ final class Base extends Prefab implements ArrayAccess {
 			$_SERVER['REQUEST_URI']=$req;
 			parse_str($query,$GLOBALS['_GET']);
 		}
-		$headers=[];
-		if (!$cli) {
-			if (function_exists('getallheaders')) {
-				foreach (getallheaders() as $key=>$val) {
-					$tmp=strtoupper(strtr($key,'-','_'));
-					// TODO: use ucwords delimiters for php 5.4.32+ & 5.5.16+
-					$key=strtr(ucwords(strtolower(strtr($key,'-',' '))),' ','-');
-					$headers[$key]=$val;
-					if (isset($_SERVER['HTTP_'.$tmp]))
-						$headers[$key]=&$_SERVER['HTTP_'.$tmp];
-				}
+		elseif (function_exists('getallheaders')) {
+			foreach (getallheaders() as $key=>$val) {
+				$tmp=strtoupper(strtr($key,'-','_'));
+				// TODO: use ucwords delimiters for php 5.4.32+ & 5.5.16+
+				$key=strtr(ucwords(strtolower(strtr($key,'-',' '))),' ','-');
+				$headers[$key]=$val;
+				if (isset($_SERVER['HTTP_'.$tmp]))
+					$headers[$key]=&$_SERVER['HTTP_'.$tmp];
 			}
-			else {
-				if (isset($_SERVER['CONTENT_LENGTH']))
-					$headers['Content-Length']=&$_SERVER['CONTENT_LENGTH'];
-				if (isset($_SERVER['CONTENT_TYPE']))
-					$headers['Content-Type']=&$_SERVER['CONTENT_TYPE'];
-				foreach (array_keys($_SERVER) as $key)
-					if (substr($key,0,5)=='HTTP_')
-						$headers[strtr(ucwords(strtolower(strtr(
-							substr($key,5),'_',' '))),' ','-')]=&$_SERVER[$key];
-			}
+		}
+		else {
+			if (isset($_SERVER['CONTENT_LENGTH']))
+				$headers['Content-Length']=&$_SERVER['CONTENT_LENGTH'];
+			if (isset($_SERVER['CONTENT_TYPE']))
+				$headers['Content-Type']=&$_SERVER['CONTENT_TYPE'];
+			foreach (array_keys($_SERVER) as $key)
+				if (substr($key,0,5)=='HTTP_')
+					$headers[strtr(ucwords(strtolower(strtr(
+						substr($key,5),'_',' '))),' ','-')]=&$_SERVER[$key];
 		}
 		if (isset($headers['X-HTTP-Method-Override']))
 			$_SERVER['REQUEST_METHOD']=$headers['X-HTTP-Method-Override'];
 		elseif ($_SERVER['REQUEST_METHOD']=='POST' && isset($_POST['_method']))
-			$_SERVER['REQUEST_METHOD']=$_POST['_method'];
+			$_SERVER['REQUEST_METHOD']=strtoupper($_POST['_method']);
 		$scheme=isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ||
 			isset($headers['X-Forwarded-Proto']) &&
 			$headers['X-Forwarded-Proto']=='https'?'https':'http';
@@ -2493,10 +2517,9 @@ class Cache extends Prefab {
 		if (!$this->dsn)
 			return TRUE;
 		$ndx=$this->prefix.'.'.$key;
-		$time=microtime(TRUE);
 		if ($cached=$this->exists($key))
-			list($time,$ttl)=$cached;
-		$data=$fw->serialize([$val,$time,$ttl]);
+			$ttl=$cached[1];
+		$data=$fw->serialize([$val,microtime(TRUE),$ttl]);
 		$parts=explode('=',$this->dsn,2);
 		switch ($parts[0]) {
 			case 'apc':
@@ -2513,7 +2536,8 @@ class Cache extends Prefab {
 			case 'xcache':
 				return xcache_set($ndx,$data,$ttl);
 			case 'folder':
-				return $fw->write($parts[1].str_replace(['/','\\'],'',$ndx),$data);
+				return $fw->write($parts[1].
+					str_replace(['/','\\'],'',$ndx),$data);
 		}
 		return FALSE;
 	}

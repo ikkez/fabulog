@@ -1,25 +1,25 @@
 [
     {
         "name": "bcosca/fatfree-core",
-        "version": "3.6.4",
-        "version_normalized": "3.6.4.0",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
             "url": "https://github.com/bcosca/fatfree-core.git",
-            "reference": "4d1a08829b14468c4821c03b9a5f3b6e4bc981e5"
+            "reference": "e3ddb8399f90af6135cb718b8f124eb912e6c599"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/bcosca/fatfree-core/zipball/4d1a08829b14468c4821c03b9a5f3b6e4bc981e5",
-            "reference": "4d1a08829b14468c4821c03b9a5f3b6e4bc981e5",
+            "url": "https://api.github.com/repos/bcosca/fatfree-core/zipball/e3ddb8399f90af6135cb718b8f124eb912e6c599",
+            "reference": "e3ddb8399f90af6135cb718b8f124eb912e6c599",
             "shasum": ""
         },
         "require": {
             "php": ">=5.4"
         },
-        "time": "2018-04-19T17:35:23+00:00",
+        "time": "2018-09-01T12:15:40+00:00",
         "type": "library",
-        "installation-source": "dist",
+        "installation-source": "source",
         "autoload": {
             "classmap": [
                 "."
@@ -34,20 +34,20 @@
     },
     {
         "name": "ikkez/f3-assets",
-        "version": "v1.1.5",
-        "version_normalized": "1.1.5.0",
+        "version": "v1.1.6",
+        "version_normalized": "1.1.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-assets.git",
-            "reference": "77189fb6270897c38e41a7e66cf703f56446d8d0"
+            "reference": "99fc507b365a166e9a9e4ba2e3da0621d290d346"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/77189fb6270897c38e41a7e66cf703f56446d8d0",
-            "reference": "77189fb6270897c38e41a7e66cf703f56446d8d0",
+            "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/99fc507b365a166e9a9e4ba2e3da0621d290d346",
+            "reference": "99fc507b365a166e9a9e4ba2e3da0621d290d346",
             "shasum": ""
         },
-        "time": "2018-05-08T12:11:55+00:00",
+        "time": "2018-08-21T10:24:47+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -76,18 +76,18 @@
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-cortex.git",
-            "reference": "269c80a635cad9eebe612a6710b6037b651265cd"
+            "reference": "0ff78f6ee03870d2150deb9a674169967687f85e"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/269c80a635cad9eebe612a6710b6037b651265cd",
-            "reference": "269c80a635cad9eebe612a6710b6037b651265cd",
+            "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/0ff78f6ee03870d2150deb9a674169967687f85e",
+            "reference": "0ff78f6ee03870d2150deb9a674169967687f85e",
             "shasum": ""
         },
         "require": {
             "ikkez/f3-schema-builder": "2.*"
         },
-        "time": "2018-05-18T15:17:57+00:00",
+        "time": "2018-07-13T14:25:43+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {

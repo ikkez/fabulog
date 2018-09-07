@@ -10,8 +10,8 @@
  *	Copyright (c) 2018 ~ ikkez
  *	Christian Knuth <ikkez0n3@gmail.com>
  *
- *	@version: 1.1.5
- *	@date: 08.05.2018
+ *	@version: 1.1.6
+ *	@date: 21.08.2018
  *	@since: 08.08.2014
  *
  **/
@@ -33,8 +33,8 @@ class Assets extends Prefab {
 	/** @var array */
 	protected $formatter;
 
-	public function __construct() {
-		$this->template = \Template::instance();
+	public function __construct(\Template $template=NULL) {
+		$this->template = $template ?: \Template::instance();
 		$f3 = $this->f3 = \Base::instance();
 		$minifyComplier = function($fileName,$path) {
 			return \Web::instance()->minify($fileName,null,false,$path);

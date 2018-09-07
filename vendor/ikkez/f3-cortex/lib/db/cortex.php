@@ -190,7 +190,8 @@ class Cortex extends Cursor {
 		$fields = array_unique($fields);
 		$schema = $this->whitelist ?: $this->mapper->fields();
 		if (!$schema && $this->dbsType != 'sql' && $this->dry()) {
-			$schema = $this->load()->mapper->fields();
+			$this->load();
+			$schema = $this->mapper->fields();
 			$this->reset();
 		}
 		// include relation linkage fields to $fields (if $fields is a whitelist)
@@ -223,11 +224,11 @@ class Cortex extends Cursor {
 	protected function applyWhitelist() {
 		if ($this->dbsType == 'sql') {
 			// fetch full schema
-			if (!$this->fluid && isset(self::$schema_cache[$this->table]))
-				$schema = self::$schema_cache[$this->table];
+			if (!$this->fluid && isset(self::$schema_cache[$key=$this->table.$this->db->uuid()]))
+				$schema = self::$schema_cache[$key];
 			else {
 				$schema = $this->mapper->schema();
-				self::$schema_cache[$this->table] = $schema;
+				self::$schema_cache[$this->table.$this->db->uuid()] = $schema;
 			}
 			// apply reduced fields schema
 			if ($this->whitelist)
@@ -872,7 +873,7 @@ class Cortex extends Cursor {
 	 * @param null  $filter
 	 * @param array $options
 	 * @param int   $ttl
-	 * @return Cortex
+	 * @return bool
 	 */
 	public function load($filter = NULL, array $options = NULL, $ttl = 0) {
 		$this->reset();
@@ -884,7 +885,7 @@ class Cortex extends Cursor {
 		} else
 			$this->mapper->reset();
 		$this->emit('load');
-		return $this;
+		return $this->valid();
 	}
 
 	/**
@@ -1623,6 +1624,17 @@ class Cortex extends Cursor {
 	}
 
 	/**
+	 * reset virtual fields
+	 * @param string $key
+	 */
+	public function clearVirtual($key=NULL) {
+		if ($key)
+			unset($this->vFields[$key]);
+		else
+			$this->vFields=[];
+	}
+
+	/**
 	 * Retrieve contents of key
 	 * @return mixed
 	 * @param string $key
@@ -2197,7 +2209,6 @@ class Cortex extends Cursor {
 		$this->saveCsd=[];
 		$this->countFields=[];
 		$this->preBinds=[];
-		$this->vFields=[];
 		$this->grp_stack=null;
 		// set default values
 		if (($this->dbsType == 'jig' || $this->dbsType == 'mongo')
@@ -2208,6 +2219,29 @@ class Cortex extends Cursor {
 						? date('Y-m-d H:i:s') : $field_conf['default'];
 					$this->set($field_key, $val);
 				}
+	}
+
+	/**
+	 * return default values from schema configuration
+	 * @param bool $set set default values to mapper
+	 * @return array
+	 */
+	function defaults($set=false) {
+		$out = [];
+		$fields = $this->fieldConf;
+		if ($this->dbsType == 'sql')
+			$fields = array_replace_recursive($this->mapper->schema(),$fields);
+		foreach($fields as $field_key => $field_conf)
+			if (array_key_exists('default',$field_conf)) {
+				$val = ($field_conf['default'] === \DB\SQL\Schema::DF_CURRENT_TIMESTAMP)
+					? date('Y-m-d H:i:s') : $field_conf['default'];
+				if ($val!==NULL) {
+					$out[$field_key]=$val;
+					if ($set)
+						$this->set($field_key, $val);
+				}
+			}
+		return $out;
 	}
 
 	/**

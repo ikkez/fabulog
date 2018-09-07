@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6c5c4281a131fda5b93a811d1abf2a2",
+    "content-hash": "92bd4eacadf755e48893445dacc0d2f1",
     "packages": [
         {
             "name": "bcosca/fatfree-core",
-            "version": "3.6.4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bcosca/fatfree-core.git",
-                "reference": "4d1a08829b14468c4821c03b9a5f3b6e4bc981e5"
+                "reference": "e3ddb8399f90af6135cb718b8f124eb912e6c599"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bcosca/fatfree-core/zipball/4d1a08829b14468c4821c03b9a5f3b6e4bc981e5",
-                "reference": "4d1a08829b14468c4821c03b9a5f3b6e4bc981e5",
+                "url": "https://api.github.com/repos/bcosca/fatfree-core/zipball/e3ddb8399f90af6135cb718b8f124eb912e6c599",
+                "reference": "e3ddb8399f90af6135cb718b8f124eb912e6c599",
                 "shasum": ""
             },
             "require": {
@@ -35,20 +35,20 @@
             ],
             "description": "A powerful yet easy-to-use PHP micro-framework designed to help you build dynamic and robust Web applications - fast!",
             "homepage": "http://fatfreeframework.com/",
-            "time": "2018-04-19T17:35:23+00:00"
+            "time": "2018-08-29T10:43:51+00:00"
         },
         {
             "name": "ikkez/f3-assets",
-            "version": "v1.1.5",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ikkez/f3-assets.git",
-                "reference": "77189fb6270897c38e41a7e66cf703f56446d8d0"
+                "reference": "99fc507b365a166e9a9e4ba2e3da0621d290d346"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/77189fb6270897c38e41a7e66cf703f56446d8d0",
-                "reference": "77189fb6270897c38e41a7e66cf703f56446d8d0",
+                "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/99fc507b365a166e9a9e4ba2e3da0621d290d346",
+                "reference": "99fc507b365a166e9a9e4ba2e3da0621d290d346",
                 "shasum": ""
             },
             "type": "library",
@@ -70,7 +70,7 @@
                 "fatfree",
                 "minify"
             ],
-            "time": "2018-05-08T12:11:55+00:00"
+            "time": "2018-08-21T10:24:47+00:00"
         },
         {
             "name": "ikkez/f3-cortex",
@@ -78,12 +78,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ikkez/f3-cortex.git",
-                "reference": "269c80a635cad9eebe612a6710b6037b651265cd"
+                "reference": "0ff78f6ee03870d2150deb9a674169967687f85e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/269c80a635cad9eebe612a6710b6037b651265cd",
-                "reference": "269c80a635cad9eebe612a6710b6037b651265cd",
+                "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/0ff78f6ee03870d2150deb9a674169967687f85e",
+                "reference": "0ff78f6ee03870d2150deb9a674169967687f85e",
                 "shasum": ""
             },
             "require": {
@@ -108,7 +108,7 @@
                 "orm",
                 "sql"
             ],
-            "time": "2018-05-18T15:17:57+00:00"
+            "time": "2018-07-13T14:25:43+00:00"
         },
         {
             "name": "ikkez/f3-flash",
@@ -219,9 +219,17 @@
         }
     ],
     "packages-dev": [],
-    "aliases": [],
+    "aliases": [
+        {
+            "alias": "3.6.4",
+            "alias_normalized": "3.6.4.0",
+            "version": "9999999-dev",
+            "package": "bcosca/fatfree-core"
+        }
+    ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "bcosca/fatfree-core": 20,
         "ikkez/f3-cortex": 20
     },
     "prefer-stable": false,
