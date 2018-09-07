@@ -56,7 +56,8 @@ class Settings extends Base {
 		}
 		$cfg->copyto('POST');
 
-		$f3->set('JIG_format', array('JSON','Serialized'));
+//		$f3->set('JIG_format', array('JSON','Serialized'));
+		$f3->set('JIG_format', array('JSON'));
 	}
 
 } 
