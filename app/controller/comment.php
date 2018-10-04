@@ -49,8 +49,9 @@ class Comment extends Resource {
 		$this->response->data['SUBPART'] = 'comment_edit.html';
 
 		if (isset($params['id'])) {
-			$this->response->data['comment'] = $this->resource->load(array('_id = ?',$params['id']));
-			if(!$this->resource->dry())
+			$this->resource->load(array('_id = ?',$params['id']));
+			$this->response->data['comment'] = $this->resource;
+			if (!$this->resource->dry())
 				return true;
 		}
 		\Flash::instance()->addMessage('Unknown Comment ID', 'danger');
