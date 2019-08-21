@@ -494,19 +494,21 @@ When both models of a relation has a `has-many` configuration on their linkage f
 To save many collections to a model you've got several ways:
 
 ``` php
-$news->load(array('_id = ?',1));
+$news->load(['_id = ?',1]);
 
 // array of IDs from TagModel
-$news->tags = array(12, 5);
+$news->tags = [12, 5];
 // OR a split-able string
 $news->tags = '12;5;3;9'; // delimiter: [,;|]
 // OR an array of single mapper objects
-$news->tags = array($tag,$tag2,$tag3);
+$news->tags = [$tag,$tag2,$tag3];
 // OR a hydrated mapper that may contain multiple results
-$news->tags = $tag->load(array('_id != ?',42));
+$tag->load(['_id != ?',42]);
+$news->tags = $tag;
 
 // you can also add a single tag to your existing tags
-$news->tags[] = $tag->load(array('_id = ?',23));
+$tag->load(['_id = ?',23]);
+$news->tags[] = $tag;
 
 $news->save();
 ```
@@ -934,7 +936,7 @@ Defines the used primary key of the table. Default is `id` for SQL engine, and *
 **Retrieve first object that satisfies criteria**
 
 ```php
-Cortex load([ array $filter = NULL [, array $options = NULL [, int $ttl = 0 ]]])
+bool load([ array $filter = NULL [, array $options = NULL [, int $ttl = 0 ]]])
 ```
 
 Simple sample to load a user:
@@ -950,7 +952,7 @@ if (!$user->dry()) {
 ```
 
 When called without any parameter, it loads the first record from the database.
-
+The method returns `TRUE` if the load action was successful.
 
 ### loaded
 **Count records that are currently loaded**
@@ -1199,12 +1201,21 @@ $news->copyfrom('POST',function($fields) {
 null copyto( string $key [, array|string $relDepth = 0 ])
 ```
 
+### copyto_flat
+**Copy mapper values to hive key with relations being simple arrays of keys**
+
+```php
+null copyto_flat( string $key )
+```
+
+All `has-many` relations are being returned as simple array lists of their primary keys.
+
 
 ### count
 **Count records that match criteria**
 
 ```php
-null count([ null $filter [, int $ttl = 60 ]])
+null count([ null $filter [, array $options = NULL [, int $ttl = 60 ]]])
 ```
 
 Just like `find()` but it only executes a count query instead of the real select.
@@ -1238,6 +1249,16 @@ string dbtype()
 ```
 
 The type is `SQL`, `Mongo` or `Jig`.
+
+
+### defaults
+**Return default values from schema configuration**
+
+```php
+array defaults([ bool $set = FALSE ])
+```
+
+Returns a `$key` => `$value` array of fields that has a default value different than `NULL`.
 
 ### dry
 **Return TRUE if current cursor position is not mapped to any record**
@@ -1472,6 +1493,14 @@ null reset([ bool $mapper = true ])
 
 If `$mapper` is *false*, it only reset filter, default values and internal caches of the mapper, but leaves the hydrates record untouched.
 
+### resetFields
+**reset only specific fields and return to their default values**
+
+```php
+null resetFields( array $fields )
+```
+
+If any field doesn't have a default value, it's reset to `NULL`.
 
 ### resolveConfiguration
 **kick start mapper to fetch its config**
@@ -1667,7 +1696,7 @@ NB: This is just a comparison - it actually does not update any of the collectio
 **check if the collection contains a record with the given key-val set**
 
 ```php
-array contains( mixed|Cortex $val [, string $key = '_id' ])
+bool contains( mixed|Cortex $val [, string $key = '_id' ])
 ```
 
 This method can come handy to check if a collections contains a given record, or has a record with a given value:
@@ -1800,6 +1829,8 @@ This removes a part from the collection.
 	* `CORTEX.smartLoading`: triggers the intelligent-lazy-eager-loading. Default is `TRUE`, but turn it off if you think something works wrong. Could cause a lot of extra queries send to your DB, if deactivated.
 
 	* `CORTEX.standardiseID`: Default `TRUE`. This moves any defined primary key into the `_id` field on returned arrays. 
+
+	* `CORTEX.quoteConditions`: Default `TRUE`. By default, all field names in where conditions are quoted automatically according to the used database engine. This helps to work around reserved names in SQL. However the detection of fields isn't perfect yet, so in case you want to add the correct backticks or other quotation yourself, set this to `FALSE`.
 
 ## Known Issues
 

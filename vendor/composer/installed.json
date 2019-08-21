@@ -34,20 +34,20 @@
     },
     {
         "name": "ikkez/f3-assets",
-        "version": "v1.1.6",
-        "version_normalized": "1.1.6.0",
+        "version": "v1.1.7",
+        "version_normalized": "1.1.7.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-assets.git",
-            "reference": "99fc507b365a166e9a9e4ba2e3da0621d290d346"
+            "reference": "2b08ab5b9f881c3834f09c8d7071262e7f0fa4e8"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/99fc507b365a166e9a9e4ba2e3da0621d290d346",
-            "reference": "99fc507b365a166e9a9e4ba2e3da0621d290d346",
+            "url": "https://api.github.com/repos/ikkez/f3-assets/zipball/2b08ab5b9f881c3834f09c8d7071262e7f0fa4e8",
+            "reference": "2b08ab5b9f881c3834f09c8d7071262e7f0fa4e8",
             "shasum": ""
         },
-        "time": "2018-08-21T10:24:47+00:00",
+        "time": "2019-02-18T16:48:13+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -76,18 +76,18 @@
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-cortex.git",
-            "reference": "0ff78f6ee03870d2150deb9a674169967687f85e"
+            "reference": "7e2fb59944bca4659f1f5015555cb8901e5deb01"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/0ff78f6ee03870d2150deb9a674169967687f85e",
-            "reference": "0ff78f6ee03870d2150deb9a674169967687f85e",
+            "url": "https://api.github.com/repos/ikkez/f3-cortex/zipball/7e2fb59944bca4659f1f5015555cb8901e5deb01",
+            "reference": "7e2fb59944bca4659f1f5015555cb8901e5deb01",
             "shasum": ""
         },
         "require": {
             "ikkez/f3-schema-builder": "2.*"
         },
-        "time": "2018-07-13T14:25:43+00:00",
+        "time": "2019-08-20T14:30:57+00:00",
         "type": "library",
         "installation-source": "source",
         "autoload": {
@@ -111,23 +111,20 @@
     },
     {
         "name": "ikkez/f3-flash",
-        "version": "1.0.0",
-        "version_normalized": "1.0.0.0",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/ikkez/f3-flash.git",
-            "reference": "c98a10271d9564157819e688536cac6487d44b96"
+            "reference": "3ba9ca1ddc80a54ff17a069c47c23e32d601c5d6"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/ikkez/f3-flash/zipball/c98a10271d9564157819e688536cac6487d44b96",
-            "reference": "c98a10271d9564157819e688536cac6487d44b96",
+            "url": "https://api.github.com/repos/ikkez/f3-flash/zipball/3ba9ca1ddc80a54ff17a069c47c23e32d601c5d6",
+            "reference": "3ba9ca1ddc80a54ff17a069c47c23e32d601c5d6",
             "shasum": ""
         },
-        "require": {
-            "bcosca/fatfree-core": "3.*"
-        },
-        "time": "2017-02-17T13:44:09+00:00",
+        "time": "2017-12-06T17:50:51+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

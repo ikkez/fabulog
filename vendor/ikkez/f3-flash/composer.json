@@ -6,8 +6,5 @@
     "license": "GPL-3.0",
     "autoload": {
         "classmap": ["lib/"]
-    },
-    "require": {
-      "bcosca/fatfree-core": "3.*"
     }
 }

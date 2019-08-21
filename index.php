@@ -67,12 +67,5 @@ if (\Controller\Auth::isLoggedIn()) {
 	$f3->config('app/routes_admin.ini');
 }
 
-$f3->route('GET /test',function( Base $f3, $params) {
-	// create demo admin user
-	$user = new \Model\User();
-	$user->load(array('username = ?', 'admin'));
-	$f3->error(500);
-});
-
 
 $f3->run();
