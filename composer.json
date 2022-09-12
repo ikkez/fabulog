@@ -3,8 +3,8 @@
     "description": "Your fabulous blogware",
     "type": "project",
     "require": {
-        "bcosca/fatfree-core": "dev-master#e3ddb8399f90af6135cb718b8f124eb912e6c599 as 3.6.4",
-        "ikkez/f3-cortex": "dev-master",
+        "bcosca/fatfree-core": "^3.8",
+        "ikkez/f3-cortex": "^1.7",
         "ikkez/f3-flash": "1.*",
         "ikkez/f3-assets": "1.*",
         "ikkez/f3-pagination": "1.*"
